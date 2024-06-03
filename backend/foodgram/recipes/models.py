@@ -1,6 +1,6 @@
 from django.db import models
 
-from backend.foodgram.users.models import Users
+from users.models import Users
 
 
 class Tag(models.Model):
@@ -37,7 +37,8 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингридиенты',
-        through='RecipeIngredient'
+        through='RecipeIngredient',
+        related_name='recipes'
     )
     image = models.ImageField(
         upload_to='recipes/images/'
@@ -46,7 +47,7 @@ class Recipe(models.Model):
         'Text',
         help_text="Input text"
     )
-    coocing_time = models.PositiveBigIntegerField(
+    coocing_time = models.PositiveIntegerField(
         verbose_name='Время приготовления',
         help_text='Введите время приготовления в минутах'
     )
@@ -59,4 +60,46 @@ class Recipe(models.Model):
 
 class RecipeIngredient(models.Model):
     """For Recipe&Ingrredient"""
-    pass
+    ingredient = models.ForeignKey(
+        Ingredient,
+        related_name='recipe',
+        on_delete=models.CASCADE,
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='ingredient',
+        on_delete=models.CASCADE,
+    )
+    quantity = models.PositiveIntegerField(
+        verbose_name='Количество',
+    )
+
+
+class FavoriteRecipes(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='favorite',
+        verbose_name='Избранный рецепт',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        Users,
+        related_name='favorite',
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE,
+    )
+
+
+class ShoppingByRecipe(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='shopp_recipe',
+        verbose_name='Список покупок',
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        Users,
+        verbose_name='Пользователь покупок',
+        related_name='shopping_cart',
+        on_delete=models.CASCADE,
+    )
