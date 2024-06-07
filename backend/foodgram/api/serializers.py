@@ -8,11 +8,8 @@ from recipes.models import (Tag,
 from users.models import Users, Subscribe
 
 
-
-
-
 class UserSerializer(serializers.ModelSerializer):
-    if_subscribed = serializers.SerializerMethodField()
+    # is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = Users
@@ -20,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'email',
                   'first_name',
                   'last_name',
-                  'if_subscribed',
+                #   'is_subscribed',
                   'id')
 
 
@@ -34,6 +31,19 @@ class TagSerializer(serializers.ModelSerializer):
 class RecipeSerialazer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-    ingredients = serializers.SerializerMethodField()
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    # ingredients = serializers.SerializerMethodField()
+    # is_favorited = serializers.SerializerMethodField()
+    # is_in_shopping_cart = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Recipe
+        fields = ('id',
+                  'tags',
+                  'author',
+                #   'ingredients',
+                #   'is_favorited',
+                #   'is_in_shopping_cart',
+                  'name',
+                  'image',
+                  'text',
+                  'cooking_time')

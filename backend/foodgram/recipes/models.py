@@ -24,6 +24,11 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
+    name = models.CharField(
+        verbose_name='Название',
+        max_length=20,
+        unique=True
+    )
 
     author = models.ForeignKey(
         Users,
@@ -47,7 +52,7 @@ class Recipe(models.Model):
         'Text',
         help_text="Input text"
     )
-    coocing_time = models.PositiveIntegerField(
+    cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления',
         help_text='Введите время приготовления в минутах'
     )
@@ -56,7 +61,13 @@ class Recipe(models.Model):
         auto_now_add=True,
         db_index=True,
     )
+    class Meta:
+        default_related_name = 'recipes'
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
 
+        def __str__(self):
+            return self.name
 
 class RecipeIngredient(models.Model):
     """For Recipe&Ingrredient"""
