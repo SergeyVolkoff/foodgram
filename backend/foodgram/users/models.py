@@ -23,6 +23,8 @@ class Users(AbstractUser):
         max_length=150,
         verbose_name='Пароль'
     )
+
+    
 class Subscribe(models.Model):
     subscribing_user = models.ForeignKey(
         Users,

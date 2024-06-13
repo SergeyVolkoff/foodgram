@@ -14,6 +14,13 @@ class Tag(models.Model):
         verbose_name = 'Название',
         max_length=100,
     )
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
+    def __str__(self):
+        return self.name
 
 
 class Ingredient(models.Model):
@@ -21,7 +28,14 @@ class Ingredient(models.Model):
         max_length=150,
         verbose_name='Единицы измерения'
     )
-
+    class Meta:
+        # ordering = ('name',)
+        verbose_name = 'Ингридиент'
+        verbose_name_plural = 'Ингридиенты'
+        
+    def __str__(self):
+        return self.name
+    
 
 class Recipe(models.Model):
     name = models.CharField(
@@ -66,8 +80,9 @@ class Recipe(models.Model):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
-        def __str__(self):
-            return self.name
+    def __str__(self):
+        return self.name
+
 
 class RecipeIngredient(models.Model):
     """For Recipe&Ingrredient"""
@@ -84,8 +99,19 @@ class RecipeIngredient(models.Model):
     quantity = models.PositiveIntegerField(
         verbose_name='Количество',
     )
+    class Meta:
+        ordering = ('recipe',)
+        # constraints = [
+        #     models.UniqueConstraint(
+        #         fields=['ingredient', 'recipe'],
+        #         name='unique_recipe_ingredient'
+        #     )
+        # ]
+            
+    def __str__(self):
+        return self.name
 
-
+    
 class FavoriteRecipes(models.Model):
     recipe = models.ForeignKey(
         Recipe,
@@ -99,6 +125,15 @@ class FavoriteRecipes(models.Model):
         verbose_name='Пользователь',
         on_delete=models.CASCADE,
     )
+    class Meta:
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
+        # constraints = [
+        #     models.UniqueConstraint(
+        #         fields=['recipe', 'user'],
+        #         name='unique_user_recipe_in_favorites'
+        #     )
+        # ]
 
 
 class ShoppingByRecipe(models.Model):
@@ -114,3 +149,9 @@ class ShoppingByRecipe(models.Model):
         related_name='shopping_cart',
         on_delete=models.CASCADE,
     )
+    class Meta:
+        verbose_name = 'Рецепт для покупок'
+        verbose_name_plural = 'Рецепты для покупок'
+    
+    def __str__(self):
+        return self.name
