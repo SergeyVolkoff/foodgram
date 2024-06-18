@@ -85,7 +85,6 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    """For Recipe&Ingrredient"""
     ingredient = models.ForeignKey(
         Ingredient,
         related_name='recipe',
