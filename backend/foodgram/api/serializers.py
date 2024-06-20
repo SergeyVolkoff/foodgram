@@ -22,7 +22,13 @@ class Base64ImageField(serializers.ImageField):
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
         return super().to_internal_value(data)
     
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
+        read_only_fields = ('__all__',)
 
+        
 class UserSerializer(serializers.ModelSerializer):
     # is_subscribed = serializers.SerializerMethodField()
 

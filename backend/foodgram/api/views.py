@@ -4,10 +4,13 @@ from django.shortcuts import render
 from rest_framework import generics, viewsets
 from rest_framework.permissions import AllowAny
 
+from .permissions import IsAdminOrReadOnly
+
 from .serializers import (UserSerializer,
                           TagSerializer,
                           RecipeSerialazerGet,
-                          RecipeSerializerSet
+                          RecipeSerializerSet,
+                          IngredientSerializer
                           )
 from recipes.models import (Tag,
                             Ingredient,
@@ -37,4 +40,15 @@ class UserViewSet(views.UserViewSet):
     queryset = Users.objects.all()
     serializer_class = UserSerializer
 
-    
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def get_queryset(self):
+        queryset = Ingredient.objects.all()
+        name = self.request.query_params.get('name')
+        # if name:
+        #     name = urllib.parse.unquote(name)
+        #     queryset = queryset.filter(name__istartswith=name)
+        return queryset
