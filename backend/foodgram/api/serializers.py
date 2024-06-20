@@ -28,7 +28,7 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('__all__',)
 
-        
+
 class UserSerializer(serializers.ModelSerializer):
     # is_subscribed = serializers.SerializerMethodField()
 
@@ -72,7 +72,7 @@ class RecipeSerialazerGet(serializers.ModelSerializer):
         read_only_fields = ('__all__',)
 
 class RecipeSerializerSet(serializers.ModelSerializer):
-    tags = PrimaryKeyRelatedField(
+    tag = PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         error_messages={'does_not_exist':'does_not_exist'},
         many=True
@@ -84,7 +84,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id',
-                  'tags',
+                  'tag',
                   'author',
                   # 'ingredients',
                   'name',
