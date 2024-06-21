@@ -1,7 +1,8 @@
 from djoser  import views
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
-from rest_framework import generics, viewsets
+from requests import Response
+from rest_framework import generics, status, viewsets
 from rest_framework.permissions import AllowAny
 
 from .permissions import IsAdminOrReadOnly
@@ -23,13 +24,23 @@ from users.models import Users, Subscribe
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    # serializer_class = RecipeSerialazerGet
+    serializer_class = RecipeSerialazerGet
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
             return RecipeSerialazerGet
         return RecipeSerializerSet
-
+    
+    @staticmethod
+    def delate_obj(request, pk, model_name):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        through_obj = model_name.objects.filter(user=request.user,
+                                                recipe=recipe)
+        if through_obj.exists():
+            through_obj.delete()
+            return Response(status.HTTP_204_NO_CONTENT)
+        return Response(status.HTTP_205_RESET_CONTENT)
+    
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
