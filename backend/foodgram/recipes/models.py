@@ -155,6 +155,11 @@ class ShoppingByRecipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт для покупок'
         verbose_name_plural = 'Рецепты для покупок'
-    
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user'],
+                name='unique_user_recipe'
+            )
+        ]
     def __str__(self):
-        return self.name
+        return f'{self.recipe} {self.user}'

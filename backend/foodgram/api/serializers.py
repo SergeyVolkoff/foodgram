@@ -52,6 +52,28 @@ class TagSerializer(serializers.ModelSerializer):
         read_only_fields = ('__all__',)
 
 
+class IngredientRecipeSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField()
+    amount = serializers.IntegerField()
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ('id',
+                  'amount',)
+
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError(
+                'amount_min'
+            )
+        elif value > 10000:
+            raise serializers.ValidationError(
+                'amount_max'
+            )
+        return value
+
+
 class RecipeSerializerSet(serializers.ModelSerializer):
     tag = PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
@@ -59,7 +81,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         many=True
     )
     image = Base64ImageField()
-    # ingredients = IngredientRecipeSerializer(many=True)
+    ingredient = IngredientRecipeSerializer(many=True)
     cooking_time = serializers.IntegerField(allow_null=False, min_value=1)
 
     class Meta:
@@ -67,7 +89,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         fields = ('id',
                   'tag',
                   'author',
-                  # 'ingredients',
+                  'ingredient',
                   'name',
                   'image',
                   'text',
@@ -170,23 +192,46 @@ class RecipeSerializerGet(serializers.ModelSerializer):
         return False
     
 
-class IngredientRecipeSerializer(serializers.ModelSerializer):
 
-    id = serializers.IntegerField()
-    amount = serializers.IntegerField()
+    
+class FavoriteRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор избранных рецептов."""
 
     class Meta:
-        model = RecipeIngredient
-        fields = ('id',
-                  'amount',)
+        model = ShoppingByRecipe
+        fields = '__all__'
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=model.objects.all(),
+                fields=['recipe', 'user'],
+                message=('Рецепт уже добавлен!')
+            )
+        ]
+    
+class ShoppingByRecipeSerializer(FavoriteRecipeSerializer):
+    """Сериализатор покупок."""
 
-    def validate_amount(self, value):
-        if value <= 0:
-            raise serializers.ValidationError(
-                'amount_min'
+    class Meta:
+        model = ShoppingByRecipe
+        fields = '__all__'
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=model.objects.all(),
+                fields=['recipe', 'user'],
+                message=('Рецепт уже добавлен!')
             )
-        elif value > 10000:
-            raise serializers.ValidationError(
-                'amount_max'
+        ]
+
+class FavoriteRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор избранных рецептов."""
+
+    class Meta:
+        model = FavoriteRecipes
+        fields = '__all__'
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=model.objects.all(),
+                fields=['recipe', 'user'],
+                message=('Рецепт уже добавлен!')
             )
-        return value
+        ]

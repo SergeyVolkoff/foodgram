@@ -15,7 +15,9 @@ from .serializers import (UserSerializer,
                           TagSerializer,
                           RecipeSerializerGet,
                           RecipeSerializerSet,
-                          IngredientSerializer
+                          IngredientSerializer,
+                          ShoppingByRecipeSerializer,
+                          FavoriteRecipeSerializer
                           )
 from recipes.models import (Tag,
                             Ingredient,
@@ -43,7 +45,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         if through_obj.exists():
             through_obj.delete()
             return Response(status.HTTP_204_NO_CONTENT)
-        return Response(status.HTTP_205_RESET_CONTENT)
+        return Response(status.HTTP_400_BAD_REQUEST)
     
     @staticmethod
     def add_obj(request, pk, serializers_name):
@@ -59,6 +61,20 @@ class RecipesViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
+    
+    @action(methods=['post'],
+            detail=True,
+            permission_classes=(IsAuthenticated,))
+    def shopping_cart(self, request, pk):
+        """
+        Реализация эндпоинта recipe/{id}/shopping_cart/
+        """
+        return self.add_obj(request, pk, ShoppingByRecipeSerializer)
+
+    @shopping_cart.mapping.delete
+    def delete_shopping_cart(self, request, pk):
+        return self.delete_obj(request, pk, ShoppingByRecipe)
+
     
     @action(detail=False,
             methods=['get', ],
@@ -85,6 +101,18 @@ class RecipesViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename={file}.pdf'
         return response
     
+    @action(methods=['post'],
+            detail=True,
+            permission_classes=(IsAuthenticated,))
+    def favorite(self, request, pk):
+        """
+        Реализация эндпоинта recipe/{id}/favorite/
+        """
+        return self.add_obj(request, pk, FavoriteRecipeSerializer)
+
+    @favorite.mapping.delete
+    def delete_favorite(self, request, pk):
+        return self.delete_obj(request, pk, FavoriteRecipes) 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
