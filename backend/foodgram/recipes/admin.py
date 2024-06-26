@@ -8,7 +8,9 @@ from recipes.models import (Tag,
                      FavoriteRecipes,
                      ShoppingByRecipe)
 
-from users.models import Subscribe, Users
+from users.models import Subscriptions, Users
+
+
 
 admin.site.register(Tag)
 admin.site.register(Ingredient)
@@ -24,14 +26,14 @@ class UserAdmins(UserAdmin):
         'email',
         'first_name',
         'last_name',
-        'count_follow',
+        # 'count_follow',
         'count_recipe',
     )
     list_filter = ('username', 'email')
     search_fields = ('username',)
 
     def count_follow(self, obj):
-        return obj.following.count()
+        return obj.folowing.count()
 
     def count_recipe(self, obj):
         return obj.recipes.count()
@@ -45,3 +47,12 @@ class UserAdmins(UserAdmin):
 #         'measurement_unit',
 #     )
 #     list_filter = ('name',)
+    
+@admin.register(Subscriptions)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'following',
+    )
+    list_filter = ('user',)
+    search_fields = ('user',)

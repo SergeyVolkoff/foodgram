@@ -17,6 +17,8 @@ from .serializers import (UserSerializer,
                           RecipeSerializerSet,
                           IngredientSerializer,
                           ShoppingByRecipeSerializer,
+                          ShowSubscriberSerializer,
+                          SubscriberSerializer,
                           FavoriteRecipeSerializer
                           )
 from recipes.models import (Tag,
@@ -25,7 +27,7 @@ from recipes.models import (Tag,
                             RecipeIngredient,
                             FavoriteRecipes,
                             ShoppingByRecipe)
-from users.models import Users, Subscribe
+from users.models import Users, Subscriptions
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
@@ -45,7 +47,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         if through_obj.exists():
             through_obj.delete()
             return Response(status.HTTP_204_NO_CONTENT)
-        return Response(status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     
     @staticmethod
     def add_obj(request, pk, serializers_name):
@@ -67,7 +69,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             permission_classes=(IsAuthenticated,))
     def shopping_cart(self, request, pk):
         """
-        Реализация эндпоинта recipe/{id}/shopping_cart/
+        Реализация эндпоинта recipe/{id}/shopping_cart
         """
         return self.add_obj(request, pk, ShoppingByRecipeSerializer)
 
@@ -114,14 +116,56 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def delete_favorite(self, request, pk):
         return self.delete_obj(request, pk, FavoriteRecipes) 
 
+
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AllowAny,)
  
+# class UserViewSet(views.UserViewSet):
+#     queryset = Users.objects.all()
+#     serializer_class = UserSerializer
+    
 class UserViewSet(views.UserViewSet):
-    queryset = Users.objects.all()
-    serializer_class = UserSerializer
+
+    @action(detail=False,
+    # pagination_class=PageLimitPagination,
+    permission_classes=(IsAuthenticated,))
+
+    def subscriptions(self, request):
+        """Реализация эндпоинта users/subscriptions/ю"""
+        user = request.user
+        folowing = Users.objects.filter(following__user=user)
+        pages = self.paginate_queryset(folowing)
+        serializer = ShowSubscriberSerializer(
+            pages,
+            context={
+                'recipes_limit': request.query_params.get('recipes_limit')
+            },
+            many=True
+        )
+        return self.get_paginated_response(serializer.data)
+
+    @action(methods=['post'],
+            detail=True,
+            permission_classes=(IsAuthenticated,))
+    def subscribe(self, request, id):
+        """
+        Реализация эндпоинта users/{id}/subscribe/
+        """
+        following = get_object_or_404(Users, pk=id)
+        serializer = SubscriberSerializer(
+            data={'user': request.user.id, 'following': following.id},
+            context={
+                'request': request,
+                'recipes_limit': request.query_params.get('recipes_limit')
+            }
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status.HTTP_201_CREATED)
+
+
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()

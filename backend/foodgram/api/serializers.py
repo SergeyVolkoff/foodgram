@@ -1,17 +1,19 @@
 import base64
 from django.db.models import F
 from django.core.files.base import ContentFile
-from rest_framework import serializers
+from django.forms import ValidationError
+from rest_framework import serializers, status
 
 from rest_framework.relations import PrimaryKeyRelatedField
 
 from recipes.models import (Tag,
                             Ingredient,
                             Recipe,
+                            RecipeTag,
                             RecipeIngredient,
                             FavoriteRecipes,
                             ShoppingByRecipe)
-from users.models import Users, Subscribe
+from users.models import Users, Subscriptions
 
 
 class Base64ImageField(serializers.ImageField):
@@ -32,17 +34,22 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # is_subscribed = serializers.SerializerMethodField()
-
+    is_subscribed = serializers.SerializerMethodField()
+    # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Users
         fields = ('username',
                   'email',
                   'first_name',
                   'last_name',
-                #   'is_subscribed',
+                  'is_subscribed',
                   'id')
-
+        # fields = "__all__"
+    def get_is_subscribed(self, obj):
+        """Проверка подписки у пользователя."""
+        user = self.context.get('request').user
+        return (not (user.is_anonymous or user == obj)
+                and user.follower.filter(following=obj).exists())
 
 class TagSerializer(serializers.ModelSerializer):
 
@@ -138,14 +145,21 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         return recipe
     
     def update(self, instance, validated_data):
-        instance.image = validated_data.get('image', instance.image)
-        instance.tags.clear()
-        tags_list = self.initial_data.get('tags')
-        instance.tags.set(tags_list)
-        RecipeIngredient.objects.filter(recipe=instance).all().delete()
-        ingredient_list = validated_data.pop('ingredients')
-        self.get_ingredient(instance, ingredient_list)
-        return super().update(instance, validated_data)
+        ingredients_data = validated_data.pop('recipe_ingredients')
+        tags_data = validated_data.pop('tags', None)
+        for (key, value) in validated_data.items():
+            setattr(instance, key, value)
+            instance.ingredients.clear()
+            instance.tags.clear()
+            if tags_data:
+                RecipeTag.objects.bulk_create(
+                    self.get_tags_list(tags_data, instance)
+                )
+            RecipeIngredient.objects.bulk_create(
+                self.get_ingredients_list(ingredients_data, instance)
+            )
+            instance.save()
+        return instance
 
     def to_representation(self, instance):
         return RecipeSerializerGet(instance, context=self.context).data
@@ -235,3 +249,78 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
                 message=('Рецепт уже добавлен!')
             )
         ]
+class RecipesSubscriberSerializer(serializers.ModelSerializer):
+    """Сериализатор рецептов короткий."""
+
+    class Meta:
+        model = Recipe
+        fields = ('id',
+                  'name',
+                  'image',
+                  'cooking_time',)
+        read_only_fields = ('__all__',)
+
+
+class ShowSubscriberSerializer(serializers.ModelSerializer):
+    """ Сериализатор для отображения подписок пользователя. """
+
+    recipes = RecipesSubscriberSerializer(many=True, read_only=True)
+    recipes_count = serializers.SerializerMethodField()
+    is_subscribed = serializers.BooleanField(default=True)
+
+    class Meta:
+        model = Users
+        fields = (
+                  'id',
+                  'email',
+                  'username',
+                  'first_name',
+                  'last_name',
+                  'is_subscribed',
+                  'recipes',
+                  'recipes_count')
+        read_only_fields = ('__all__',)
+
+    def get_recipes_count(self, obj):
+        """Количество подписок у пользователя."""
+        return obj.recipes.count()
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        request = self.root.context.get('request')
+        if request is not None:
+            count = request.query_params.get('recipes_limit')
+        else:
+            count = self.root.context.get('recipes_limit')
+        if count is not None:
+            rep['recipes'] = rep['recipes'][:int(count)]
+        return rep
+    
+    
+class SubscriberSerializer(serializers.ModelSerializer):
+    """Сериализатор подписок."""
+
+    class Meta:
+        model = Subscriptions
+        fields = ('user',
+                  'following',)
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=Subscriptions.objects.all(),
+                fields=['user', 'following'],
+                message='не подписаны на автора'
+            )
+        ]
+
+    def validate(self, data):
+        if data.get('user') == data.get('following'):
+            raise ValidationError(
+                'Нельзя подписаться на себя',
+                status.HTTP_400_BAD_REQUEST
+            )
+        return data
+
+    def to_representation(self, instance):
+        return ShowSubscriberSerializer(instance.following, context={
+            'request': self.context.get('request')
+        }).data

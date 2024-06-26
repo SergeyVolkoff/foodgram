@@ -30,31 +30,31 @@ class Users(AbstractUser):
 
     def __str__(self):
         return self.username
+    
 
     
-class Subscribe(models.Model):
-    subscribing_user = models.ForeignKey(
+class Subscriptions(models.Model):
+
+    user = models.ForeignKey(
         Users,
         on_delete=models.CASCADE,
-        related_name='subscribitions',
-        verbose_name='Подписчик'
+        related_name='follower'
     )
-    user_to_subscribe = models.ForeignKey(
+    following = models.ForeignKey(
         Users,
         on_delete=models.CASCADE,
-        related_name='subscribers',
-        verbose_name='Автор'
+        related_name='following'
     )
     class Meta:
 
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
-        # constraints = [
-        #     models.UniqueConstraint(
-        #         fields=['subscribing_user', 'user_to_subscribe'],
-        #         name='unique_subscribe'
-        #     )
-        # ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'following'],
+                name='unique_user_following'
+            )
+        ]
         def __str__(self):
             return f'{self.user} {self.following}'
