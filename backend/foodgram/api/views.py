@@ -9,6 +9,8 @@ from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from .pagination import DefaultPagination
+
 from .permissions import IsAdminOrReadOnly
 
 from .serializers import (UserSerializer,
@@ -68,9 +70,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             detail=True,
             permission_classes=(IsAuthenticated,))
     def shopping_cart(self, request, pk):
-        """
-        Реализация эндпоинта recipe/{id}/shopping_cart
-        """
+        """recipe/{id}/shopping_cart."""
         return self.add_obj(request, pk, ShoppingByRecipeSerializer)
 
     @shopping_cart.mapping.delete
@@ -82,15 +82,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
             methods=['get', ],
             permission_classes=[IsAuthenticated, ])
     def download_shopping_cart(self, request):
-        qw_st = RecipeIngredient.objects.filter(
+        data_req = RecipeIngredient.objects.filter(
             recipe__buy_recipe__user=request.user
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit',).annotate(
                 amount=Sum('amount')).order_by('ingredient__name')
-
         ingredient_list = 'Cписок покупок:'
-        for value in qw_st:
+        for value in data_req:
             name = value['ingredient__name']
             measurement_unit = value['ingredient__measurement_unit']
             amount = value['amount']
@@ -107,9 +106,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             detail=True,
             permission_classes=(IsAuthenticated,))
     def favorite(self, request, pk):
-        """
-        Реализация эндпоинта recipe/{id}/favorite/
-        """
+        """recipe/{id}/favorite/."""
         return self.add_obj(request, pk, FavoriteRecipeSerializer)
 
     @favorite.mapping.delete
@@ -121,19 +118,16 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AllowAny,)
- 
-# class UserViewSet(views.UserViewSet):
-#     queryset = Users.objects.all()
-#     serializer_class = UserSerializer
+
     
 class UserViewSet(views.UserViewSet):
 
     @action(detail=False,
-    # pagination_class=PageLimitPagination,
+    pagination_class=DefaultPagination,
     permission_classes=(IsAuthenticated,))
 
     def subscriptions(self, request):
-        """Реализация эндпоинта users/subscriptions/ю"""
+        """users/subscriptions/."""
         user = request.user
         folowing = Users.objects.filter(following__user=user)
         pages = self.paginate_queryset(folowing)
@@ -150,9 +144,7 @@ class UserViewSet(views.UserViewSet):
             detail=True,
             permission_classes=(IsAuthenticated,))
     def subscribe(self, request, id):
-        """
-        Реализация эндпоинта users/{id}/subscribe/
-        """
+        """users/{id}/subscribe/."""
         following = get_object_or_404(Users, pk=id)
         serializer = SubscriberSerializer(
             data={'user': request.user.id, 'following': following.id},

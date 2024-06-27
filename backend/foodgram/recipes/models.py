@@ -89,6 +89,7 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
+    '''Bridging model!'''
     ingredient = models.ForeignKey(
         Ingredient,
         related_name='recipe',
@@ -104,15 +105,12 @@ class RecipeIngredient(models.Model):
     )
     class Meta:
         ordering = ('recipe',)
-        # constraints = [
-        #     models.UniqueConstraint(
-        #         fields=['ingredient', 'recipe'],
-        #         name='unique_recipe_ingredient'
-        #     )
-        # ]
-            
-    def __str__(self):
-        return self.name
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'],
+                name='unique_recipe_ingredient'
+            )
+        ]
 
     
 class FavoriteRecipes(models.Model):

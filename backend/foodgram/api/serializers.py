@@ -17,8 +17,6 @@ from users.models import Users, Subscriptions
 
 
 class Base64ImageField(serializers.ImageField):
-    """Конвертация base64."""
-
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
@@ -27,6 +25,9 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
     
 class IngredientSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Ingredient objects.
+    """
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -34,6 +35,9 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    Short presentation of User for users list.
+    """
     is_subscribed = serializers.SerializerMethodField()
     # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
@@ -52,6 +56,9 @@ class UserSerializer(serializers.ModelSerializer):
                 and user.follower.filter(following=obj).exists())
 
 class TagSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Tag objects.
+    """
 
     class Meta:
         model = Tag
@@ -60,7 +67,9 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for Ingredient.
+    """
     id = serializers.IntegerField()
     amount = serializers.IntegerField()
 
@@ -82,6 +91,9 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializerSet(serializers.ModelSerializer):
+    """
+    Serializer for Post, Patch.
+    """
     tag = PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         error_messages={'does_not_exist':'does_not_exist'},
@@ -165,6 +177,9 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         return RecipeSerializerGet(instance, context=self.context).data
 
 class RecipeSerializerGet(serializers.ModelSerializer):
+    """
+    Serializer for read.
+    """
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
@@ -209,7 +224,6 @@ class RecipeSerializerGet(serializers.ModelSerializer):
 
     
 class FavoriteRecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор избранных рецептов."""
 
     class Meta:
         model = ShoppingByRecipe
@@ -223,7 +237,7 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
         ]
     
 class ShoppingByRecipeSerializer(FavoriteRecipeSerializer):
-    """Сериализатор покупок."""
+    """Purchase serializer."""
 
     class Meta:
         model = ShoppingByRecipe
@@ -236,21 +250,8 @@ class ShoppingByRecipeSerializer(FavoriteRecipeSerializer):
             )
         ]
 
-class FavoriteRecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор избранных рецептов."""
 
-    class Meta:
-        model = FavoriteRecipes
-        fields = '__all__'
-        validators = [
-            serializers.UniqueTogetherValidator(
-                queryset=model.objects.all(),
-                fields=['recipe', 'user'],
-                message=('Рецепт уже добавлен!')
-            )
-        ]
-class RecipesSubscriberSerializer(serializers.ModelSerializer):
-    """Сериализатор рецептов короткий."""
+class RecipeSerializerShort(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
@@ -262,9 +263,11 @@ class RecipesSubscriberSerializer(serializers.ModelSerializer):
 
 
 class ShowSubscriberSerializer(serializers.ModelSerializer):
-    """ Сериализатор для отображения подписок пользователя. """
+    """
+    Serializer for displaying user subscriptions.
+    """
 
-    recipes = RecipesSubscriberSerializer(many=True, read_only=True)
+    recipes = RecipeSerializerShort(many=True, read_only=True)
     recipes_count = serializers.SerializerMethodField()
     is_subscribed = serializers.BooleanField(default=True)
 
@@ -298,7 +301,6 @@ class ShowSubscriberSerializer(serializers.ModelSerializer):
     
     
 class SubscriberSerializer(serializers.ModelSerializer):
-    """Сериализатор подписок."""
 
     class Meta:
         model = Subscriptions

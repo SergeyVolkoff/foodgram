@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from recipes.models import (Tag,
                      Ingredient,
                      Recipe,
+                     RecipeTag,
                      RecipeIngredient,
                      FavoriteRecipes,
                      ShoppingByRecipe)
@@ -18,9 +19,11 @@ admin.site.register(Recipe)
 admin.site.register(FavoriteRecipes)
 admin.site.register(RecipeIngredient)
 admin.site.register(ShoppingByRecipe)
+admin.site.register(Subscriptions)
+admin.site.register(Users)
 
-@admin.register(Users)
-class UserAdmins(UserAdmin):
+
+class UserAdmin(UserAdmin):
     list_display = (
         'username',
         'email',
@@ -40,19 +43,47 @@ class UserAdmins(UserAdmin):
     count_follow.short_description = 'Кол-во подписчиков'
     count_recipe.short_description = 'Кол-во рецептов'
 
-# @admin.register(Ingredient)
-# class IngredientAdmin(admin.ModelAdmin):
-#     list_display = (
-#         'name',
-#         'measurement_unit',
-#     )
-#     list_filter = ('name',)
-    
-@admin.register(Subscriptions)
-class FollowAdmin(admin.ModelAdmin):
+
+class TagAdmin(admin.ModelAdmin):
+    list_display = (
+        'name', 'slug', 'color'
+    )
+
+
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'measurement_unit',
+    )
+    list_filter = ('name',)
+
+
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'author',
+        'in_favorited'
+    )
+
+    list_filter = ('tags',)
+    search_fields = ('name', 'author', 'tags')
+
+    def in_favorited(self, obj):
+        return Subscriptions.objects.filter(
+            recipe=obj
+        ).count()
+    in_favorited.short_description  = 'В избранных'
+
+
+class RecipeIngredientAdmin(admin.ModelAdmin):
+    list_display = (
+        'recipe',
+        'ingredient'
+    )
+
+
+class FavoritesAdmin(admin.ModelAdmin):
     list_display = (
         'user',
-        'following',
+        'recipe'
     )
-    list_filter = ('user',)
-    search_fields = ('user',)
