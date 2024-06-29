@@ -6,14 +6,14 @@ from rest_framework import serializers, status
 
 from rest_framework.relations import PrimaryKeyRelatedField
 
-from recipes.models import (Tag,
+from foodgram.recipes.models import (Tag,
                             Ingredient,
                             Recipe,
                             RecipeTag,
                             RecipeIngredient,
                             FavoriteRecipes,
                             ShoppingByRecipe)
-from users.models import Users, Subscriptions
+from foodgram.users.models import Users, Subscriptions
 
 
 class Base64ImageField(serializers.ImageField):

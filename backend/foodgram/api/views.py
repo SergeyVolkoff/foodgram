@@ -23,13 +23,13 @@ from .serializers import (UserSerializer,
                           SubscriberSerializer,
                           FavoriteRecipeSerializer
                           )
-from recipes.models import (Tag,
+from foodgram.recipes.models import (Tag,
                             Ingredient,
                             Recipe,
                             RecipeIngredient,
                             FavoriteRecipes,
                             ShoppingByRecipe)
-from users.models import Users, Subscriptions
+from foodgram.users.models import Users, Subscriptions
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
