@@ -28,8 +28,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'foodgram.api',
-    'recipes',
-    'users',
+    'foodgram.recipes',
+    'foodgram.users',
 ]
 
 MIDDLEWARE = [
