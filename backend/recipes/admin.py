@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from foodgram.recipes.models import (Tag,
+from recipes.models import (Tag,
                      Ingredient,
                      Recipe,
                      RecipeTag,
@@ -9,7 +9,7 @@ from foodgram.recipes.models import (Tag,
                      FavoriteRecipes,
                      ShoppingByRecipe)
 
-from foodgram.users.models import Subscriptions, Users
+from users.models import Subscriptions, Users
 
 
 
