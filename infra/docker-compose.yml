@@ -22,9 +22,10 @@ services:
       - db_container
 
   frontend_container:
-    env_file: ../.env
-    build: ../frontend
-    command: cp -r /app/build/. /frontend_static/
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      command: cp -r /app/build/. /frontend_static
     volumes:
       - static:/frontend_static
 
