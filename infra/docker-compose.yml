@@ -8,7 +8,7 @@ volumes:
 services:
   db_container:
     image: postgres:13
-    env_file: .env
+    env_file: ../.env
     volumes:
       - foodgram_data:/var/lib/postgresql/data
 
