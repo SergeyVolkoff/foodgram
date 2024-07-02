@@ -13,7 +13,7 @@ services:
       - foodgram_data:/var/lib/postgresql/data
 
   backend_container:
-    build: ./backend/
+    build: ../backend/
     env_file: ../.env
     volumes:
       - static:/static_backend/
@@ -34,7 +34,7 @@ services:
       - frontend_container
       - db_container
     # image: foodgram_gateway
-    build: ./gateway/
+    build: ../gateway/
     ports:
       - 7000:80
     volumes:
