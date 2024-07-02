@@ -25,13 +25,13 @@ services:
     command: cp -r /app/build/. /static/
     volumes:
       - static:/static
-  gateway:
+  foodgram_gateway:
     depends_on:
       - foodgram_backend_container
       - foodgram_front
       - foodgram_db_container
-    image: foodgram_gateway
-    # build: ./nginx/
+    # image: foodgram_gateway
+    build: ./gateway/
     env_file: .env
     ports:
       - 7000:80
