@@ -14,7 +14,7 @@ services:
 
   backend_container:
     build: ./backend/
-    env_file: .env
+    env_file: ../.env
     volumes:
       - static:/static_backend/
       - media:/app/media
@@ -22,7 +22,7 @@ services:
       - db_container
 
   frontend_container:
-    env_file: .env
+    env_file: ../.env
     build: ./frontend
     command: cp -r /app/build/. /frontend_static/
     volumes:
@@ -35,7 +35,6 @@ services:
       - db_container
     # image: foodgram_gateway
     build: ./gateway/
-    env_file: .env
     ports:
       - 7000:80
     volumes:
