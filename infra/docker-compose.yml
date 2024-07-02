@@ -25,12 +25,12 @@ services:
     build: ./frontend
     command: cp -r /app/build/. /frontend_static/
     volumes:
-      - static:/static
+      - static:/frontend_static
 
   gateway:
     depends_on:
       - backend_container
-      - front_container
+      - frontend_container
       - db_container
     # image: foodgram_gateway
     build: ./gateway/
