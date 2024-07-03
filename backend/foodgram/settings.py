@@ -120,8 +120,8 @@ AUTH_USER_MODEL = 'users.Users'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static_backend/'
-STATIC_ROOT = BASE_DIR / 'static_backend' 
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'collected_static' 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type

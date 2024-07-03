@@ -34,13 +34,13 @@ services:
     depends_on:
       - backend
       - frontend
-      - db
     # image: foodgram_gateway
     build: ../gateway/
     ports:
       - 8000:80
     volumes:
       - static:/static/
+      - media:/app/media
 
   # nginx:
   #   container_name: foodgram-proxy
