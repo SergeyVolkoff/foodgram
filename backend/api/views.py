@@ -1,7 +1,7 @@
 from django.db.models import Sum
 from django.forms import ValidationError
 from django.http import HttpResponse
-from djoser  import views
+from djoser import views
 from django.shortcuts import get_object_or_404, render
 
 from requests import Response
@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .pagination import DefaultPagination
 
-from .permissions import IsAdminOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 from .serializers import (UserSerializer,
                           TagSerializer,
@@ -35,6 +35,8 @@ from users.models import Users, Subscriptions
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializerGet
+    pagination_class = DefaultPagination
+    permission_classes = (IsOwnerOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
@@ -142,6 +144,7 @@ class UserViewSet(views.UserViewSet):
 
     @action(methods=['post'],
             detail=True,
+            pagination_class=DefaultPagination,
             permission_classes=(IsAuthenticated,))
     def subscribe(self, request, id):
         """users/{id}/subscribe/."""

@@ -1,6 +1,12 @@
 import os
 
+import rest_framework.permissions
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +36,7 @@ INSTALLED_APPS = [
     'api',
     'recipes',
     'users',
+    'djoser',
 ]
 
 MIDDLEWARE = [
@@ -115,7 +122,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = 'users.Users'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -123,7 +130,39 @@ AUTH_USER_MODEL = 'users.Users'
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'collected_static' 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+AUTH_USER_MODEL = 'users.Users'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 6,
+}
+
+DJOSER = {
+    'SET_PASSWORD_RETYPE': False,
+    'HIDE_USERS': False,
+    'LOGIN_FIELD': 'email',
+    'PERMISSIONS': {
+        'user_create': (rest_framework.permissions.AllowAny,),
+        'token_create': (rest_framework.permissions.AllowAny,),
+        'token_destroy': (rest_framework.permissions.IsAuthenticated,),
+        'password_reset': (rest_framework.permissions.IsAuthenticated,),
+
+    },
+    'SERIALIZERS': {
+        'user': 'api.serializers.UserSerializer',
+        'current_user': 'api.serializers.UserSerializer',
+    },
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

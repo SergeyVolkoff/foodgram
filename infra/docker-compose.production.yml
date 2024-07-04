@@ -13,6 +13,7 @@ services:
       - foodgram_data:/var/lib/postgresql/data
 
   backend:
+    # image: karryserg/food_backend
     build: ../backend/
     env_file: ../.env
     volumes:
@@ -23,6 +24,7 @@ services:
       - db
 
   frontend:
+    # image: karryserg/food_frontend
     build:
       context: ../frontend
       dockerfile: Dockerfile
@@ -34,7 +36,7 @@ services:
     depends_on:
       - backend
       - frontend
-    # image: foodgram_gateway
+    # image: karryserg/food_gateway
     build: ../gateway/
     ports:
       - 8000:80
