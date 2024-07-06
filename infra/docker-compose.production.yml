@@ -17,9 +17,9 @@ services:
     #build: ../backend/
     env_file: ../.env
     volumes:
-      - static:/static_backend
+      - static:/backend_static
       - media:/app/media
-    # command: cp -r /app/collected_static/. static_backend/static/ 
+    # command: cp -r /app/collected_static/. backend_static/static/ 
     depends_on:
       - db
 
@@ -28,9 +28,9 @@ services:
     # build:
     #   context: ../frontend
     #   dockerfile: Dockerfile
-    command: cp -r /app/build/. /static
+    command: cp -r /app/build/. /frontend_static
     volumes:
-      - static:/static
+      - static:/frontend_static
 
   gateway:
     depends_on:
@@ -43,6 +43,9 @@ services:
     volumes:
       - static:/static/
       - media:/app/media
+      - ../docs/:/usr/share/nginx/html/api/docs/
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
 
   # nginx:
   #   container_name: foodgram-proxy
