@@ -41,11 +41,9 @@ services:
     ports:
       - 8000:80
     volumes:
-      - static:/static/
+      - static:/staticfiles/
       - media:/app/media
-      - ../docs/:/usr/share/nginx/html/api/docs/
-      - static_value:/var/html/static/
-      - media_value:/var/html/media/
+      
 
   # nginx:
   #   container_name: foodgram-proxy
