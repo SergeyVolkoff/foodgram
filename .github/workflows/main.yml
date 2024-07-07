@@ -1,10 +1,7 @@
-
 name: Main Foodgram Workflow
 # Перечень событий-триггеров, при которых должен запускаться workflow
 on:
   push:
-    branches:
-      - master
 
 jobs:
   tests:
