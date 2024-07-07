@@ -84,4 +84,4 @@ jobs:
         with:
           context: ./infra/
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_gateway:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/food_gateway:latest
