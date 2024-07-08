@@ -44,7 +44,7 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=20,
+        max_length=100,
         unique=True
     )
 

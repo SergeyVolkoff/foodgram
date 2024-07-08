@@ -23,6 +23,7 @@ class Users(AbstractUser):
         max_length=150,
         verbose_name='Пароль'
     )
+
     class Meta:
         ordering = ('username',)
         verbose_name = 'Пользователь'
@@ -30,9 +31,8 @@ class Users(AbstractUser):
 
     def __str__(self):
         return self.username
-    
 
-    
+
 class Subscriptions(models.Model):
 
     user = models.ForeignKey(
@@ -45,8 +45,8 @@ class Subscriptions(models.Model):
         on_delete=models.CASCADE,
         related_name='following'
     )
-    class Meta:
 
+    class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
@@ -56,5 +56,6 @@ class Subscriptions(models.Model):
                 name='unique_user_following'
             )
         ]
+
         def __str__(self):
             return f'{self.user} {self.following}'
