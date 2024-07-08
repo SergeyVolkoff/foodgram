@@ -1,5 +1,4 @@
 import base64
-from django.db.models import F
 from django.core.files.base import ContentFile
 from django.forms import ValidationError
 from rest_framework import serializers, status
@@ -23,7 +22,8 @@ class Base64ImageField(serializers.ImageField):
             ext = format.split('/')[-1]
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
         return super().to_internal_value(data)
-    
+
+
 class IngredientSerializer(serializers.ModelSerializer):
     """
     Serializer for Ingredient objects.
@@ -40,6 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
     is_subscribed = serializers.SerializerMethodField()
     # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Users
         fields = ('username',
@@ -49,21 +50,13 @@ class UserSerializer(serializers.ModelSerializer):
                   'is_subscribed',
                   'id')
         # fields = "__all__"
-        
-    # def create(self, validated_data):
-    #     user = Users(
-    #         email=validated_data['email'],
-    #         username=validated_data['username']
-    #     )
-    #     user.set_password(validated_data['password'])
-    #     user.save()
-    #     return user
-    
+
     def get_is_subscribed(self, obj):
         """Проверка подписки у пользователя."""
         user = self.context.get('request').user
         return (not (user.is_anonymous or user == obj)
                 and user.follower.filter(following=obj).exists())
+
 
 class TagSerializer(serializers.ModelSerializer):
     """
@@ -106,7 +99,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
     """
     tag = PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
-        error_messages={'does_not_exist':'does_not_exist'},
+        error_messages={'does_not_exist': 'does_not_exist'},
         many=True
     )
     image = Base64ImageField()
@@ -120,8 +113,8 @@ class RecipeSerializerSet(serializers.ModelSerializer):
                   'author',
                   'ingredient',
                   'name',
-                  'image',
                   'text',
+                  'image',
                   'cooking_time')
         read_only_fields = ('author',)
 
@@ -215,7 +208,6 @@ class RecipeSerializerGet(serializers.ModelSerializer):
         return obj.ingredients.values('id',
                                       'name',
                                       'units_measure',
-                                    #   amount=F('recipe__amount')
                                       )
 
     def get_is_favorited(self, obj):

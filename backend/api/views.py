@@ -36,7 +36,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializerGet
     pagination_class = DefaultPagination
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
