@@ -42,7 +42,7 @@ services:
       - 8000:80
     volumes:
       - static:/static/
-      - media:/app/media
+      - media:/media/
       
 
   # nginx:
