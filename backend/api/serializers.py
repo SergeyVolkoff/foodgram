@@ -294,11 +294,11 @@ class ShowSubscriberSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         represent = super().to_representation(instance)
         request = self.root.context.get('request')
-        if request is not None:
+        if request:
             count = request.query_params.get('recipes_limit')
         else:
             count = self.root.context.get('recipes_limit')
-        if count is not None:
+        if count:
             represent['recipes'] = represent['recipes'][:int(count)]
         return represent
 
