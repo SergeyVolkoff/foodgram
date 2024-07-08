@@ -50,14 +50,14 @@ class UserSerializer(serializers.ModelSerializer):
                   'id')
         # fields = "__all__"
         
-    def create(self, validated_data):
-        user = Users(
-            email=validated_data['email'],
-            username=validated_data['username']
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+    # def create(self, validated_data):
+    #     user = Users(
+    #         email=validated_data['email'],
+    #         username=validated_data['username']
+    #     )
+    #     user.set_password(validated_data['password'])
+    #     user.save()
+    #     return user
     
     def get_is_subscribed(self, obj):
         """Проверка подписки у пользователя."""
