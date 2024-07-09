@@ -1,9 +1,7 @@
 import base64
 from django.core.files.base import ContentFile
 from django.forms import ValidationError
-from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers, status
-
 from rest_framework.relations import PrimaryKeyRelatedField
 
 from recipes.models import (Tag,
@@ -59,6 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
                 and user.follower.filter(following=obj).exists())
     
 
+    
 class TagSerializer(serializers.ModelSerializer):
     """
     Serializer for Tag objects.

@@ -23,7 +23,6 @@ from .serializers import (TagSerializer,
                           ShowSubscriberSerializer,
                           SubscriberSerializer,
                           FavoriteRecipeSerializer,
-                          CustomUserCreateSerializer
                           )
 from recipes.models import (Tag,
                             Ingredient,
@@ -126,8 +125,9 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class UserViewSet(views.UserViewSet):
 
     def get_permissions(self):
-        if self.action == 'retrieve':
-            return (rest_framework.permissions.AllowAny(),)
+    
+        if self.action == 'me':
+            self.permission_classes = (IsAuthenticated,)
         return super().get_permissions()
 
 
@@ -165,7 +165,14 @@ class UserViewSet(views.UserViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
-
+    @subscribe.mapping.delete
+    def delete_subscribe(self, request, id):
+        following = get_object_or_404(Users, pk=id)
+        through_following = Follow.objects.filter(user=request.user, following=following)
+        if through_following.exists():
+            through_following.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'errors': 'Not subscribed.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
