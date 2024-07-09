@@ -1,6 +1,7 @@
 import base64
 from django.core.files.base import ContentFile
 from django.forms import ValidationError
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers, status
 
 from rest_framework.relations import PrimaryKeyRelatedField
@@ -57,6 +58,34 @@ class UserSerializer(serializers.ModelSerializer):
         return (not (user.is_anonymous or user == obj)
                 and user.follower.filter(following=obj).exists())
 
+
+class CustomUserCreateSerializer(UserCreateSerializer):
+    """
+    Custom serializer for create user.
+    Available via POST to /api/users/.
+    """
+
+    password = serializers.CharField(style={"input_type": "password"},
+                                     write_only=True)
+
+    class Meta(UserCreateSerializer.Meta):
+        model = Users
+        fields = ('email', 'id',
+                  'username', 'first_name',
+                  'last_name', 'password')
+
+    def validate_username(self, value):
+        if Users.objects.filter(username=value).exists():
+            raise serializers.ValidationError('Данный никнейм'
+                                              ' уже зарегистрирован')
+        return value
+
+    def validate_email(self, value):
+        if Users.objects.filter(email=value).exists():
+            raise serializers.ValidationError('Данный электронный'
+                                              ' адрес уже зарегистрирован')
+        return value
+    
 
 class TagSerializer(serializers.ModelSerializer):
     """

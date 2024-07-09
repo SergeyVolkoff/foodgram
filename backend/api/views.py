@@ -13,7 +13,6 @@ from .pagination import DefaultPagination
 
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
-
 from .serializers import (TagSerializer,
                           RecipeSerializerGet,
                           RecipeSerializerSet,
@@ -21,7 +20,8 @@ from .serializers import (TagSerializer,
                           ShoppingByRecipeSerializer,
                           ShowSubscriberSerializer,
                           SubscriberSerializer,
-                          FavoriteRecipeSerializer
+                          FavoriteRecipeSerializer,
+                          CustomUserCreateSerializer
                           )
 from recipes.models import (Tag,
                             Ingredient,
@@ -122,6 +122,13 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class UserViewSet(views.UserViewSet):
+
+
+
+
+
+
+
 
     @action(detail=False,
             pagination_class=DefaultPagination,
