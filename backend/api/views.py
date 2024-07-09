@@ -1,3 +1,5 @@
+import rest_framework.permissions
+
 from django.db.models import Sum
 from django.forms import ValidationError
 from django.http import HttpResponse
@@ -123,11 +125,10 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 class UserViewSet(views.UserViewSet):
 
-
-
-
-
-
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (rest_framework.permissions.AllowAny(),)
+        return super().get_permissions()
 
 
     @action(detail=False,
