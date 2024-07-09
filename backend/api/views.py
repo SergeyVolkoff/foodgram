@@ -2,10 +2,10 @@ from django.db.models import Sum
 from django.forms import ValidationError
 from django.http import HttpResponse
 from djoser import views
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 
 from requests import Response
-from rest_framework import generics, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -13,8 +13,8 @@ from .pagination import DefaultPagination
 
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
-from .serializers import (UserSerializer,
-                          TagSerializer,
+
+from .serializers import (TagSerializer,
                           RecipeSerializerGet,
                           RecipeSerializerSet,
                           IngredientSerializer,
@@ -29,7 +29,7 @@ from recipes.models import (Tag,
                             RecipeIngredient,
                             FavoriteRecipes,
                             ShoppingByRecipe)
-from users.models import Users, Subscriptions
+from users.models import Users
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
@@ -42,7 +42,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve'):
             return RecipeSerializerGet
         return RecipeSerializerSet
-    
+
     @staticmethod
     def delete_obj(request, pk, model_name):
         recipe = get_object_or_404(Recipe, pk=pk)
@@ -52,7 +52,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             through_obj.delete()
             return Response(status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    
+
     @staticmethod
     def add_obj(request, pk, serializers_name):
         try:
@@ -67,7 +67,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
-    
+
     @action(methods=['post'],
             detail=True,
             permission_classes=(IsAuthenticated,))
@@ -79,7 +79,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def delete_shopping_cart(self, request, pk):
         return self.delete_obj(request, pk, ShoppingByRecipe)
 
-    
     @action(detail=False,
             methods=['get', ],
             permission_classes=[IsAuthenticated, ])
@@ -103,7 +102,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         )
         response['Content-Disposition'] = f'attachment; filename={file}.pdf'
         return response
-    
+
     @action(methods=['post'],
             detail=True,
             permission_classes=(IsAuthenticated,))
@@ -113,7 +112,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
-        return self.delete_obj(request, pk, FavoriteRecipes) 
+        return self.delete_obj(request, pk, FavoriteRecipes)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -121,13 +120,12 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     permission_classes = (AllowAny,)
 
-    
+
 class UserViewSet(views.UserViewSet):
 
     @action(detail=False,
-    pagination_class=DefaultPagination,
-    permission_classes=(IsAuthenticated,))
-
+            pagination_class=DefaultPagination,
+            permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
         """users/subscriptions/."""
         user = request.user
@@ -161,7 +159,6 @@ class UserViewSet(views.UserViewSet):
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 
-
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
@@ -169,7 +166,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = Ingredient.objects.all()
-        name = self.request.query_params.get('name')
+        # name = self.request.query_params.get('name')
         # if name:
         #     name = urllib.parse.unquote(name)
         #     queryset = queryset.filter(name__istartswith=name)

@@ -22,7 +22,7 @@ SECRET_KEY = 'django-insecure-1cv%#e9#-oi!y^ik9h)nl63n(m@p2yoifo9*&1=ym0ys)iys^$
 DEBUG = False
 
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1;localhost').split(';')
-ALLOWED_HOSTS = ['51.250.26.198', '127.0.0.1', 'localhost','foodgramic.ddns.net']
+ALLOWED_HOSTS = ['51.250.26.198', '127.0.0.1', 'localhost', 'foodgramic.ddns.net']
 # Application definition
 
 INSTALLED_APPS = [
@@ -89,7 +89,6 @@ PSQL = {
         'NAME': os.getenv('POSTGRES_DB', 'foodgram'),
         'USER': os.getenv('POSTGRES_USER', 'foodgram_user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        
     }
 }
 DATABASES = SQLITE if DEBUG else PSQL
@@ -124,14 +123,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'collected_static' 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

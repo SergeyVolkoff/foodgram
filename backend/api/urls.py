@@ -9,15 +9,14 @@ from .views import (RecipesViewSet,
                     )
 
 router = routers.DefaultRouter()
-router.register(r'recipes', RecipesViewSet,basename='recipes')
+router.register(r'recipes', RecipesViewSet, basename='recipes')
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'tags', TagViewSet, basename='tags')
-router.register(r'ingridients',IngredientViewSet, basename='ingridients')
+router.register(r'ingridients', IngredientViewSet, basename='ingridients')
 
 
 urlpatterns = [
     path('', include(router.urls)),
     # path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
-
 ]

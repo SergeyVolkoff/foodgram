@@ -2,16 +2,13 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from recipes.models import (Tag,
-                     Ingredient,
-                     Recipe,
-                     RecipeTag,
-                     RecipeIngredient,
-                     FavoriteRecipes,
-                     ShoppingByRecipe)
+                            Ingredient,
+                            Recipe,
+                            RecipeIngredient,
+                            FavoriteRecipes,
+                            ShoppingByRecipe)
 
 from users.models import Subscriptions, Users
-
-
 
 admin.site.register(Tag)
 admin.site.register(Ingredient)
@@ -72,7 +69,7 @@ class RecipeAdmin(admin.ModelAdmin):
         return Subscriptions.objects.filter(
             recipe=obj
         ).count()
-    in_favorited.short_description  = 'В избранных'
+    in_favorited.short_description = 'В избранных'
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):

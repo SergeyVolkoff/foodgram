@@ -11,9 +11,10 @@ class Tag(models.Model):
     )
     slug = models.SlugField()
     color = models.CharField(
-        verbose_name = 'Название',
+        verbose_name='Название',
         max_length=100,
     )
+
     class Meta:
         ordering = ('name',)
         verbose_name = 'Тег'
@@ -32,14 +33,15 @@ class Ingredient(models.Model):
         max_length=150,
         verbose_name='Единицы измерения'
     )
+
     class Meta:
         # ordering = ('name',)
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
-        
+
     def __str__(self):
         return self.name
-    
+
 
 class Recipe(models.Model):
     name = models.CharField(
@@ -79,6 +81,7 @@ class Recipe(models.Model):
         auto_now_add=True,
         db_index=True,
     )
+
     class Meta:
         default_related_name = 'recipes'
         verbose_name = 'Рецепт'
@@ -103,6 +106,7 @@ class RecipeIngredient(models.Model):
     quantity = models.PositiveIntegerField(
         verbose_name='Количество',
     )
+
     class Meta:
         ordering = ('recipe',)
         constraints = [
@@ -112,7 +116,7 @@ class RecipeIngredient(models.Model):
             )
         ]
 
-    
+
 class FavoriteRecipes(models.Model):
     recipe = models.ForeignKey(
         Recipe,
@@ -126,6 +130,7 @@ class FavoriteRecipes(models.Model):
         verbose_name='Пользователь',
         on_delete=models.CASCADE,
     )
+
     class Meta:
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
@@ -150,6 +155,7 @@ class ShoppingByRecipe(models.Model):
         related_name='shopping_cart',
         on_delete=models.CASCADE,
     )
+
     class Meta:
         verbose_name = 'Рецепт для покупок'
         verbose_name_plural = 'Рецепты для покупок'
@@ -159,9 +165,11 @@ class ShoppingByRecipe(models.Model):
                 name='unique_user_recipe'
             )
         ]
+
     def __str__(self):
         return f'{self.recipe} {self.user}'
-    
+
+
 class RecipeTag(models.Model):
     recipe = models.ForeignKey(
         Recipe,
