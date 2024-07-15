@@ -1,6 +1,7 @@
 import base64
 from django.core.files.base import ContentFile
 from django.forms import ValidationError
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, status
 from rest_framework.relations import PrimaryKeyRelatedField
 
@@ -14,19 +15,17 @@ from recipes.models import (Tag,
 from users.models import Users, Subscriptions
 
 
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-        return super().to_internal_value(data)
+# class Base64ImageField(serializers.ImageField):
+#     def to_internal_value(self, data):
+#         if isinstance(data, str) and data.startswith('data:image'):
+#             format, imgstr = data.split(';base64,')
+#             ext = format.split('/')[-1]
+#             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+#         return super().to_internal_value(data)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Ingredient objects.
-    """
+   
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -34,9 +33,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """
-    Short presentation of User for users list.
-    """
+    
     is_subscribed = serializers.SerializerMethodField()
     # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
@@ -51,7 +48,6 @@ class UserSerializer(serializers.ModelSerializer):
         # fields = "__all__"
 
     def get_is_subscribed(self, obj):
-        """Проверка подписки у пользователя."""
         user = self.context.get('request').user
         return (not (user.is_anonymous or user == obj)
                 and user.follower.filter(following=obj).exists())
@@ -59,9 +55,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     
 class TagSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Tag objects.
-    """
 
     class Meta:
         model = Tag
@@ -70,9 +63,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Ingredient.
-    """
+    
     id = serializers.IntegerField()
     amount = serializers.IntegerField()
 
@@ -94,9 +85,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializerSet(serializers.ModelSerializer):
-    """
-    Serializer for Post, Patch.
-    """
+  
     tag = PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         error_messages={'not_exist': 'tag_not_exist'},
@@ -119,34 +108,29 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         read_only_fields = ('author',)
 
     def validate(self, data):
-        ingredients_data = data.get('ingredients')
+        ingredients_data = self.initial_data.get('ingredients')
         tags = data.get('tags')
 
-        if not tags or len(tags) == 0:
+        if not tags:
             raise serializers.ValidationError(
-                "Рецепт должен содержать хотя бы один тег.")
+                "Должен быть хотя бы один тег!")
 
         if len(tags) != len(set(tags)):
-            raise serializers.ValidationError("Теги должны быть уникальными.")
+            raise serializers.ValidationError("Теги должны быть уникальными!")
 
         for tag in tags:
             if not Tag.objects.filter(id=tag.id).exists():
                 raise serializers.ValidationError(
-                    f"Тег с ID {tag.id} не был найден.")
+                    f"Тег с ID {tag.id} не был найден!")
 
+        if not ingredients_data:
+            raise serializers.ValidationError(
+                "Должен быть хотя бы один ингредиент!")
+        
         if not isinstance(ingredients_data, list):
             raise serializers.ValidationError(
-                "Не был получен список ингредиентов.")
-
-        if not ingredients_data or len(ingredients_data) == 0:
-            raise serializers.ValidationError(
-                "Рецепт должен содержать хотя бы один ингредиент.")
-
-        if len(ingredients_data) != len(set(tuple(ingredient.items())
-                                            for ingredient
-                                            in ingredients_data)):
-            raise serializers.ValidationError(
-                "Ингредиенты должны быть уникальными.")
+                "Не был получен список ингредиентов!")
+        
         return data
 
     def create(self, validated_data):
@@ -239,7 +223,6 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
 
 
 class ShoppingByRecipeSerializer(FavoriteRecipeSerializer):
-    """Purchase serializer."""
 
     class Meta:
         model = ShoppingByRecipe

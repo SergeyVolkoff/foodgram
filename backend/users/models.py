@@ -1,14 +1,20 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.contrib.auth.validators import UnicodeUsernameValidator
+
 
 
 class Users(AbstractUser):
+
+    username_validator = UnicodeUsernameValidator()
+
     username = models.CharField(
         max_length=150,
         unique=True,
+        validators=[username_validator],
     )
     email = models.EmailField(
-        max_length=254,
+        max_length=150,
         unique=True,
     )
     first_name = models.CharField(
@@ -24,6 +30,9 @@ class Users(AbstractUser):
         verbose_name='Пароль'
     )
 
+    REQUIRED_FIELDS = ("first_name", "last_name", "username")
+    USERNAME_FIELD = "email"
+    
     class Meta:
         ordering = ('username',)
         verbose_name = 'Пользователь'

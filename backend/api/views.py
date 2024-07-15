@@ -3,7 +3,7 @@ import rest_framework.permissions
 from django.db.models import Sum
 from django.forms import ValidationError
 from django.http import HttpResponse
-from djoser import views
+from djoser.views import UserViewSet
 from django.shortcuts import get_object_or_404
 
 from requests import Response
@@ -23,6 +23,7 @@ from .serializers import (TagSerializer,
                           ShowSubscriberSerializer,
                           SubscriberSerializer,
                           FavoriteRecipeSerializer,
+                          UserSerializer,
                           )
 from recipes.models import (Tag,
                             Ingredient,
@@ -30,7 +31,7 @@ from recipes.models import (Tag,
                             RecipeIngredient,
                             FavoriteRecipes,
                             ShoppingByRecipe)
-from users.models import Users
+from users.models import Users,Subscriptions
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
@@ -122,7 +123,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
 
 
-class UserViewSet(views.UserViewSet):
+class UserViewSet(UserViewSet):
 
     def get_permissions(self):
     
@@ -165,15 +166,17 @@ class UserViewSet(views.UserViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
+    
     @subscribe.mapping.delete
     def delete_subscribe(self, request, id):
         following = get_object_or_404(Users, pk=id)
-        through_following = Follow.objects.filter(user=request.user, following=following)
+        through_following = Subscriptions.objects.filter(user=request.user,
+                                                  following=following)
         if through_following.exists():
             through_following.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response({'errors': 'Not subscribed.'}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response(status.HTTP_204_NO_CONTENT)
+        return Response({'errors':'not_subscription'})
+ 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
