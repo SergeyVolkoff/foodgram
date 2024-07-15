@@ -134,8 +134,8 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(author=self.context.get('request').user,
                                        **validated_data)
         recipe.tags.set(tags)
@@ -176,15 +176,9 @@ class RecipeSerializerGet(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id',
-                  'tags',
-                  'author',
-                  'ingredients',
-                  'is_favorited',
-                  'is_in_shopping_cart',
-                  'name',
-                  'image',
-                  'text',
+        fields = ('id', 'tags', 'author', 'ingredients',
+                  'is_favorited', 'is_in_shopping_cart',
+                  'name', 'image', 'text',
                   'cooking_time')
         read_only_fields = ('__all__',)
 
@@ -195,10 +189,10 @@ class RecipeSerializerGet(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
-        if user and not user.is_anonymous:
-            return FavoriteRecipes.objects.filter(
+        if user.is_anonymous:
+            return False
+        return FavoriteRecipes.objects.filter(
                 user=user, recipe=obj).exists()
-        return False
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
@@ -217,7 +211,7 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
             serializers.UniqueTogetherValidator(
                 queryset=model.objects.all(),
                 fields=['recipe', 'user'],
-                message=('Рецепт уже добавлен!')
+                message='Рецепт уже добавлен!'
             )
         ]
 
@@ -231,7 +225,7 @@ class ShoppingByRecipeSerializer(FavoriteRecipeSerializer):
             serializers.UniqueTogetherValidator(
                 queryset=model.objects.all(),
                 fields=['recipe', 'user'],
-                message=('Рецепт уже добавлен!')
+                message='Рецепт уже добавлен!'
             )
         ]
 
@@ -269,18 +263,23 @@ class ShowSubscriberSerializer(serializers.ModelSerializer):
         read_only_fields = ('__all__',)
 
     def get_recipes_count(self, obj):
-        return obj.recipes.count()
-
+        return Recipe.objects.filter(author=obj).count()
+    
     def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        request = self.root.context.get('request')
-        if request is not None:
-            count = request.query_params.get('recipes_limit')
-        else:
-            count = self.root.context.get('recipes_limit')
-        if count is not None:
-            rep['recipes'] = rep['recipes'][:int(count)]
-        return rep
+        recipe = RecipeSerializerShort(instance.recipe,
+                                       context=self.context).data
+        return recipe
+
+    # def to_representation(self, instance):
+    #     rep = super().to_representation(instance)
+    #     request = self.root.context.get('request')
+    #     if request is not None:
+    #         count = request.query_params.get('recipes_limit')
+    #     else:
+    #         count = self.root.context.get('recipes_limit')
+    #     if count is not None:
+    #         rep['recipes'] = rep['recipes'][:int(count)]
+    #     return rep
 
 
 class SubscriberSerializer(serializers.ModelSerializer):
