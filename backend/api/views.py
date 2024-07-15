@@ -34,9 +34,15 @@ from recipes.models import (Tag,
 from users.models import Users,Subscriptions
 
 
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = (AllowAny,)
+
+
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializerGet
+    # serializer_class = RecipeSerializerGet
     pagination_class = DefaultPagination
     permission_classes = (IsOwnerOrReadOnly,)
 
@@ -117,20 +123,15 @@ class RecipesViewSet(viewsets.ModelViewSet):
         return self.delete_obj(request, pk, FavoriteRecipes)
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-    permission_classes = (AllowAny,)
+
 
 
 class UserViewSet(UserViewSet):
 
     def get_permissions(self):
-    
         if self.action == 'me':
             self.permission_classes = (IsAuthenticated,)
         return super().get_permissions()
-
 
     @action(detail=False,
             pagination_class=DefaultPagination,

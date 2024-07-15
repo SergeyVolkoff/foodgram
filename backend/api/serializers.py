@@ -58,8 +58,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = '__all__'
-        read_only_fields = ('__all__',)
+        fields = ('id', 'name', 'slug', 'color')
 
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
@@ -86,9 +85,8 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
 class RecipeSerializerSet(serializers.ModelSerializer):
   
-    tag = PrimaryKeyRelatedField(
+    tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
-        error_messages={'not_exist': 'tag_not_exist'},
         many=True
     )
     image = Base64ImageField()
@@ -98,7 +96,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id',
-                  'tag',
+                  'tags',
                   'author',
                   'ingredient',
                   'name',
@@ -109,7 +107,8 @@ class RecipeSerializerSet(serializers.ModelSerializer):
 
     def validate(self, data):
         ingredients_data = self.initial_data.get('ingredients')
-        tags = data.get('tags')
+        # tags = data.get('tags')
+        tags = self.initial_data.get('tags')
 
         if not tags:
             raise serializers.ValidationError(
@@ -132,29 +131,36 @@ class RecipeSerializerSet(serializers.ModelSerializer):
                 "Не был получен список ингредиентов!")
         
         return data
-
+    
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
+        cooking_time = validated_data.pop('cooking_time')
         recipe = Recipe.objects.create(author=self.context.get('request').user,
+                                       cooking_time=cooking_time,
                                        **validated_data)
+        
+        for ingredient in ingredients:
+            ingredient = Ingredient.objects.get(id=ingredient['id'].id)
+            RecipeIngredient.objects.create(recipe=recipe,
+                                            ingredient=ingredient,
+                                            amount=ingredient['amount'])
         recipe.tags.set(tags)
-        self.get_ingredient(recipe, ingredients)
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients_data = validated_data.pop('recipe_ingredients')
-        tags_data = validated_data.pop('tags', None)
+        ingredients = validated_data.pop('recipe_ingredients')
+        tags = validated_data.pop('tags', None)
         for (key, value) in validated_data.items():
             setattr(instance, key, value)
             instance.ingredients.clear()
             instance.tags.clear()
-            if tags_data:
+            if tags:
                 RecipeTag.objects.bulk_create(
-                    self.get_tags_list(tags_data, instance)
+                    self.get_tags_list(tags, instance)
                 )
             RecipeIngredient.objects.bulk_create(
-                self.get_ingredients_list(ingredients_data, instance)
+                self.get_ingredients_list(ingredients, instance)
             )
             instance.save()
         return instance
