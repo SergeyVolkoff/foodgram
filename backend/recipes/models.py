@@ -9,7 +9,7 @@ class Tag(models.Model):
         max_length=100,
         unique=True
     )
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)
     color = models.CharField(
         verbose_name='Название',
         max_length=100,
@@ -55,7 +55,7 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Автор рецепта'
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         Tag,
         verbose_name="Tags"
     )
