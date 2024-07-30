@@ -40,16 +40,16 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
 
 
-class RecipesViewSet(viewsets.ModelViewSet):
+class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     # serializer_class = RecipeSerializerGet
     pagination_class = DefaultPagination
-    permission_classes = (IsOwnerOrReadOnly,)
+    # permission_classes = (IsOwnerOrReadOnly,)
 
     def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
-            return RecipeSerializerGet
-        return RecipeSerializerSet
+        if self.action in ('create', 'update', 'partial_update'):
+            return  RecipeSerializerSet
+        return RecipeSerializerGet
 
     @staticmethod
     def delete_obj(request, pk, model_name):
@@ -96,13 +96,13 @@ class RecipesViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit',).annotate(
-                amount=Sum('amount')).order_by('ingredient__name')
+                quantity=Sum('quantity')).order_by('ingredient__name')
         ingredient_list = 'Cписок покупок:'
         for value in data_req:
             name = value['ingredient__name']
             measurement_unit = value['ingredient__measurement_unit']
-            amount = value['amount']
-            ingredient_list += f'\n{name} - {amount} {measurement_unit}'
+            quantity = value['quantity']
+            ingredient_list += f'\n{name} - {quantity} {measurement_unit}'
         file = 'ingredient_list'
         response = HttpResponse(
             ingredient_list,
@@ -183,10 +183,10 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (IsAdminOrReadOnly,)
 
-    def get_queryset(self):
-        queryset = Ingredient.objects.all()
-        # name = self.request.query_params.get('name')
-        # if name:
-        #     name = urllib.parse.unquote(name)
-        #     queryset = queryset.filter(name__istartswith=name)
-        return queryset
+    # def get_queryset(self):
+    #     queryset = Ingredient.objects.all()
+    #     name = self.request.query_params.get('name')
+    #     if name:
+    #         name = urllib.parse.unquote(name)
+    #         queryset = queryset.filter(name__istartswith=name)
+    #     return queryset

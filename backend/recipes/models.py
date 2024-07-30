@@ -11,8 +11,9 @@ class Tag(models.Model):
     )
     slug = models.SlugField(unique=True)
     color = models.CharField(
-        verbose_name='Название',
+        verbose_name='Slag',
         max_length=100,
+        unique=True
     )
 
     class Meta:
@@ -46,8 +47,7 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=100,
-        unique=True
+        max_length=100
     )
 
     author = models.ForeignKey(
@@ -55,7 +55,7 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Автор рецепта'
     )
-    tags = models.ManyToManyField(
+    tag = models.ManyToManyField(
         Tag,
         verbose_name="Tags"
     )
@@ -83,9 +83,10 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        default_related_name = 'recipes'
+        ordering = ('-id',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        default_related_name = 'recipes'
 
     def __str__(self):
         return self.name
@@ -97,11 +98,13 @@ class RecipeIngredient(models.Model):
         Ingredient,
         related_name='recipe',
         on_delete=models.CASCADE,
+        verbose_name='Ингридиенты'
     )
     recipe = models.ForeignKey(
         Recipe,
         related_name='ingredient',
         on_delete=models.CASCADE,
+        verbose_name='Рецепта'
     )
     quantity = models.PositiveIntegerField(
         verbose_name='Количество',
@@ -116,7 +119,9 @@ class RecipeIngredient(models.Model):
             )
         ]
 
-
+    def __str__(self):
+        return f'{self.ingredient} {self.quantity}'
+    
 class FavoriteRecipes(models.Model):
     recipe = models.ForeignKey(
         Recipe,
