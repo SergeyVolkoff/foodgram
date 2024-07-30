@@ -1,6 +1,7 @@
 import base64
 from django.core.files.base import ContentFile
 from django.forms import ValidationError
+from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, status
 from rest_framework.relations import PrimaryKeyRelatedField
@@ -32,7 +33,7 @@ class IngredientSerializer(serializers.ModelSerializer):
         read_only_fields = ('__all__',)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class FoodUserSerializer(UserSerializer):
     
     is_subscribed = serializers.SerializerMethodField()
     # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -52,6 +53,8 @@ class UserSerializer(serializers.ModelSerializer):
         return (not (user.is_anonymous or user == obj)
                 and user.follower.filter(following=obj).exists())
     
+    def create(self, validated_data):
+        return Users.objects.create_user(**validated_data)
 
     
 class TagSerializer(serializers.ModelSerializer):
@@ -61,28 +64,30 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'slug', 'color')
 
 
+
+
 class IngredientRecipeSerializer(serializers.ModelSerializer):
-    # name = serializers.ReadOnlyField(source='ingredient.name')
+    name = serializers.ReadOnlyField(source='ingredient.name')
     # id = serializers.ReadOnlyField(source='ingredient_id')
     id = serializers.IntegerField()
     quantity = serializers.IntegerField()
-    # units_measure = serializers.ReadOnlyField(
-    #     source='ingredient.units_measure')
+    units_measure = serializers.ReadOnlyField(
+        source='ingredient.units_measure')
 
     class Meta:
         model = RecipeIngredient
-        fields = ( 'id','quantity',)
+        fields = ( 'id', 'name', 'quantity','units_measure')
 
-    def validate_quantity(self, value):
-        if value <= 0:
-            raise serializers.ValidationError(
-                'Количество не может быть 0'
-            )
-        elif value > 50:
-            raise serializers.ValidationError(
-                'Количество не может быть > 50'
-            )
-        return value
+    # def validate_quantity(self, value):
+    #     if value <= 0:
+    #         raise serializers.ValidationError(
+    #             'Количество не может быть 0'
+    #         )
+    #     elif value > 50:
+    #         raise serializers.ValidationError(
+    #             'Количество не может быть > 50'
+    #         )
+    #     return value
 
 
 class RecipeSerializerGet(serializers.ModelSerializer):
@@ -90,9 +95,9 @@ class RecipeSerializerGet(serializers.ModelSerializer):
     Serializer for read.
     """
     tag = TagSerializer(many=True)
-    author = UserSerializer(read_only=True)
-    # ingredient = IngredientRecipeSerializer(many=True,)
-    ingredient = serializers.SerializerMethodField()
+    author = FoodUserSerializer(read_only=True)
+    ingredient = IngredientRecipeSerializer(many=True,)
+    # ingredient = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
@@ -125,6 +130,28 @@ class RecipeSerializerGet(serializers.ModelSerializer):
         return False
 
 
+class CustomIngredientRecipeSerializer(IngredientRecipeSerializer):
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    # id = serializers.ReadOnlyField(source='ingredient_id')
+    id = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+    # units_measure = serializers.ReadOnlyField(
+    #     source='ingredient.units_measure')
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ( 'id', 'name', 'quantity')
+
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError(
+                'Количество не может быть 0'
+            )
+        elif value > 50:
+            raise serializers.ValidationError(
+                'Количество не может быть > 50'
+            )
+        return value
 
 
 class RecipeSerializerSet(serializers.ModelSerializer):
@@ -137,16 +164,16 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         many=True
     )
     image = Base64ImageField()
-    ingredients = IngredientRecipeSerializer(many=True)
+    ingredients = CustomIngredientRecipeSerializer()
     cooking_time = serializers.IntegerField(allow_null=False, min_value=1)
 
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'author', 'image', 'text',
+        fields = ('name', 'author', 'image', 'text',
                   'ingredients', 'tag', 'cooking_time')
 
     def validate(self, data):
-        ingredients_data = self.initial_data.get('ingredient')
+        ingredients_data = self.initial_data.get('ingredients')
         # tags = data.get('tags')
         tag = self.initial_data.get('tag')
 
@@ -157,10 +184,10 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         if len(tag) != len(set(tag)):
             raise serializers.ValidationError("Теги должны быть уникальными!")
 
-        for tag in tag:
-            if not Tag.objects.filter(id=tag.id).exists():
-                raise serializers.ValidationError(
-                    f"Тег с ID {tag.id} не был найден!")
+        # for tag in tag:
+        #     if not Tag.objects.filter(id=tag.id).exists():
+        #         raise serializers.ValidationError(
+        #             f"Тег с ID {tag.id} не был найден!")
 
         if not ingredients_data:
             raise serializers.ValidationError(

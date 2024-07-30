@@ -2,7 +2,7 @@ import rest_framework.permissions
 
 from django.db.models import Sum
 from django.forms import ValidationError
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from djoser.views import UserViewSet
 from django.shortcuts import get_object_or_404
 
@@ -23,7 +23,7 @@ from .serializers import (TagSerializer,
                           ShowSubscriberSerializer,
                           SubscriberSerializer,
                           FavoriteRecipeSerializer,
-                          UserSerializer,
+                          FoodUserSerializer,
                           )
 from recipes.models import (Tag,
                             Ingredient,
