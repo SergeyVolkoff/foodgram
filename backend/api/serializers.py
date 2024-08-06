@@ -159,7 +159,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
     Serializer for write.
     """
   
-    tag = serializers.PrimaryKeyRelatedField(
+    tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
     )
@@ -170,7 +170,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('name', 'author', 'image', 'text',
-                  'ingredients', 'tag', 'cooking_time')
+                  'ingredients', 'tags', 'cooking_time')
 
     def validate(self, data):
         ingredients_data = self.initial_data.get('ingredients')
