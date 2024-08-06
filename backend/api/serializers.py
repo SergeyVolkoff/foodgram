@@ -94,7 +94,7 @@ class RecipeSerializerGet(serializers.ModelSerializer):
     """
     Serializer for read.
     """
-    tag = TagSerializer(many=True)
+    tags = TagSerializer(many=True)
     author = FoodUserSerializer(read_only=True)
     ingredient = IngredientRecipeSerializer(many=True,)
     # ingredient = serializers.SerializerMethodField()
@@ -104,7 +104,7 @@ class RecipeSerializerGet(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tag', 'author', 'ingredient',
+        fields = ('id', 'tags', 'author', 'ingredient',
                   'is_favorited', 'is_in_shopping_cart',
                   'name', 'image', 'text',
                   'cooking_time')
@@ -130,8 +130,8 @@ class RecipeSerializerGet(serializers.ModelSerializer):
         return False
 
 
-class CustomIngredientRecipeSerializer(IngredientRecipeSerializer):
-    name = serializers.ReadOnlyField(source='ingredient.name')
+class CustomIngredientRecipeSerializer(serializers.ModelSerializer):
+    name = serializers.ReadOnlyField()
     # id = serializers.ReadOnlyField(source='ingredient_id')
     id = serializers.IntegerField()
     quantity = serializers.IntegerField()
