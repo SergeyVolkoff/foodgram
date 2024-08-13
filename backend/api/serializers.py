@@ -76,7 +76,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RecipeIngredient
-        fields = ( 'id', 'name', 'quantity','units_measure')
+        fields = ( 'id', 'name', 'quantity','units_measure')    
 
     # def validate_quantity(self, value):
     #     if value <= 0:

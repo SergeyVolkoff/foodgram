@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 from users.models import Users
 
@@ -101,6 +103,13 @@ class RecipeIngredient(models.Model):
         related_name='ingredient',
         on_delete=models.CASCADE,
         verbose_name='Рецепт'
+    )
+    quantity = models.PositiveSmallIntegerField(
+        verbose_name='Количество',
+        default=1,
+        validators=[
+            MinValueValidator(
+                1, message='Ингредиентов не может быть меньше 1')]
     )
 
 class ShoppingByRecipe(models.Model):
