@@ -34,6 +34,19 @@ from recipes.models import (Tag,
 from users.models import Users,Subscriptions
 
 
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    permission_classes = (AllowAny,)
+
+    # def get_queryset(self):
+    #     queryset = Ingredient.objects.all()
+    #     name = self.request.query_params.get('name')
+    #     if name:
+    #         name = urllib.parse.unquote(name)
+    #         queryset = queryset.filter(name__istartswith=name)
+    #     return queryset
+
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -96,13 +109,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit',).annotate(
-                quantity=Sum('quantity')).order_by('ingredient__name')
+                amount=Sum('amount')).order_by('ingredient__name')
         ingredient_list = 'Cписок покупок:'
         for value in data_req:
             name = value['ingredient__name']
             measurement_unit = value['ingredient__measurement_unit']
-            quantity = value['quantity']
-            ingredient_list += f'\n{name} - {quantity} {measurement_unit}'
+            amount = value['amount']
+            ingredient_list += f'\n{name} - {amount} {measurement_unit}'
         file = 'ingredient_list'
         response = HttpResponse(
             ingredient_list,
@@ -127,6 +140,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(UserViewSet):
+    queryset = Users.objects.all()
+    serializer_class = FoodUserSerializer
+    # permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = DefaultPagination
 
     def get_permissions(self):
         if self.action == 'me':
@@ -134,7 +151,7 @@ class UserViewSet(UserViewSet):
         return super().get_permissions()
 
     @action(detail=False,
-            pagination_class=DefaultPagination,
+            # pagination_class=DefaultPagination,
             permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
         """users/subscriptions/."""
@@ -152,7 +169,7 @@ class UserViewSet(UserViewSet):
 
     @action(methods=['post'],
             detail=True,
-            pagination_class=DefaultPagination,
+            # pagination_class=DefaultPagination,
             permission_classes=(IsAuthenticated,))
     def subscribe(self, request, id):
         """users/{id}/subscribe/."""
@@ -178,15 +195,4 @@ class UserViewSet(UserViewSet):
             return Response(status.HTTP_204_NO_CONTENT)
         return Response({'errors':'not_subscription'})
  
-class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
-    permission_classes = (IsAdminOrReadOnly,)
 
-    # def get_queryset(self):
-    #     queryset = Ingredient.objects.all()
-    #     name = self.request.query_params.get('name')
-    #     if name:
-    #         name = urllib.parse.unquote(name)
-    #         queryset = queryset.filter(name__istartswith=name)
-    #     return queryset
