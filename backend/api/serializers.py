@@ -70,15 +70,15 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField(source='ingredient.name')
     # id = serializers.ReadOnlyField(source='ingredient_id')
     id = serializers.IntegerField()
-    quantity = serializers.IntegerField()
+    amount = serializers.IntegerField()
     units_measure = serializers.ReadOnlyField(
         source='ingredient.units_measure')
 
     class Meta:
         model = RecipeIngredient
-        fields = ( 'id', 'name', 'quantity','units_measure')    
+        fields = ( 'id', 'name', 'amount','units_measure')    
 
-    # def validate_quantity(self, value):
+    # def validate_amount(self, value):
     #     if value <= 0:
     #         raise serializers.ValidationError(
     #             'Количество не может быть 0'
@@ -134,15 +134,15 @@ class CustomIngredientRecipeSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField()
     # id = serializers.ReadOnlyField(source='ingredient_id')
     id = serializers.IntegerField()
-    quantity = serializers.IntegerField()
+    amount = serializers.IntegerField()
     # units_measure = serializers.ReadOnlyField(
     #     source='ingredient.units_measure')
 
     class Meta:
         model = RecipeIngredient
-        fields = ( 'id', 'name', 'quantity')
+        fields = ( 'id', 'name', 'amount')
 
-    def validate_quantity(self, value):
+    def validate_amount(self, value):
         if value <= 0:
             raise serializers.ValidationError(
                 'Количество не может быть 0'
@@ -214,7 +214,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'Ингридиенты должны быть уникальными')
             ingredient_list.append(ingredient)
-            if int(item['quantity']) < 1:
+            if int(item['amount']) < 1:
                 raise serializers.ValidationError({
                     'ingredients':
                     ('Значение ингредиента должно быть больше 0')})
@@ -229,7 +229,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
             RecipeIngredient(
                 recipe=recipe,
                 ingredient_id=ingredient_data['id'],
-                quantity=ingredient_data['quantity']
+                amount=ingredient_data['amount']
             )
             for ingredient_data in ingredients_data
         ]
@@ -248,7 +248,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
             ingredient = Ingredient.objects.get(id=ingredient['id'].id)
             RecipeIngredient.objects.create(recipe=recipe,
                                             ingredient=ingredient,
-                                            quantity=ingredient['quantity'])
+                                            amount=ingredient['amount'])
         recipe.tag.set(tag)
         self.create_ingredients(recipe, ingredients)
         return recipe
