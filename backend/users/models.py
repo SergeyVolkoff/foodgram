@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
-
 class Users(AbstractUser):
 
     username_validator = UnicodeUsernameValidator()
@@ -32,7 +31,7 @@ class Users(AbstractUser):
 
     REQUIRED_FIELDS = ("first_name", "last_name", "username")
     USERNAME_FIELD = "email"
-    
+
     class Meta:
         ordering = ('username',)
         verbose_name = 'Пользователь'
