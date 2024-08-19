@@ -216,23 +216,25 @@ class RecipeSerializerSet(serializers.ModelSerializer):
                     'ingredients':
                     ('Значение ингредиента должно быть больше 0')})
         data['ingredients'] = ingredients
-        
         return data
     
-    
-    def create_ingredients(self, recipe, ingredients_data):
-        ingredient_objects = [
-            RecipeIngredient(
-                recipe=recipe,
-                ingredient_id=ingredient_data['id'],
-                amount=ingredient_data['amount']
+    def create_ingredients(self,recipe, ingredients):
+        ingredients_obj = []
+        for ingredient in ingredients:
+            ingredient_obj = Ingredient.objects.get(id=ingredient.get('id'))
+            amount = ingredient['amount']
+            ingredients_obj.append(
+                RecipeIngredient(
+                    ingredient=ingredient_obj,
+                    amount=amount,
+                    recipe=recipe
+                )
             )
-            for ingredient_data in ingredients_data
-        ]
-        RecipeIngredient.objects.bulk_create(ingredient_objects)
+        RecipeIngredient.objects.bulk_create(ingredients_obj)
 
+    
     def create(self, validated_data):
-       
+        '''create recipe'''
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         cooking_time = validated_data.pop('cooking_time')
@@ -240,12 +242,6 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data, author=user,
                                        cooking_time=cooking_time,
                                        )
-        
-        for element  in ingredients:
-            ingredient = Ingredient.objects.get(id=ingredient['id'].id)
-            RecipeIngredient.objects.create(recipe=recipe,
-                                            ingredient=ingredient,
-                                            amount=ingredient['amount'])
         recipe.tags.set(tags)
         self.create_ingredients(recipe, ingredients)
         return recipe
