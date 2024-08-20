@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .pagination import DefaultPagination
-# from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 from .serializers import (TagSerializer,
                           RecipeSerializerGet,
@@ -47,7 +47,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     # serializer_class = RecipeSerializerGet
     pagination_class = DefaultPagination
-    # permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
@@ -129,7 +129,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class UserViewSet(UserViewSet):
     queryset = Users.objects.all()
     serializer_class = FoodUserSerializer
-    # permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = DefaultPagination
 
     def get_permissions(self):
@@ -138,7 +138,7 @@ class UserViewSet(UserViewSet):
         return super().get_permissions()
 
     @action(detail=False,
-            # pagination_class=DefaultPagination,
+            pagination_class=DefaultPagination,
             permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
         """users/subscriptions/."""
@@ -156,7 +156,7 @@ class UserViewSet(UserViewSet):
 
     @action(methods=['post'],
             detail=True,
-            # pagination_class=DefaultPagination,
+            pagination_class=DefaultPagination,
             permission_classes=(IsAuthenticated,))
     def subscribe(self, request, id):
         """users/{id}/subscribe/."""
