@@ -1,8 +1,6 @@
-import rest_framework.permissions
-
 from django.db.models import Sum
 from django.forms import ValidationError
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from djoser.views import UserViewSet
 from django.shortcuts import get_object_or_404
 
@@ -12,8 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .pagination import DefaultPagination
-
-from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+# from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 from .serializers import (TagSerializer,
                           RecipeSerializerGet,
@@ -31,7 +28,7 @@ from recipes.models import (Tag,
                             RecipeIngredient,
                             FavoriteRecipes,
                             ShoppingByRecipe)
-from users.models import Users,Subscriptions
+from users.models import Users, Subscriptions
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -39,13 +36,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
 
-    # def get_queryset(self):
-    #     queryset = Ingredient.objects.all()
-    #     name = self.request.query_params.get('name')
-    #     if name:
-    #         name = urllib.parse.unquote(name)
-    #         queryset = queryset.filter(name__istartswith=name)
-    #     return queryset
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
@@ -61,7 +51,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
-            return  RecipeSerializerSet
+            return RecipeSerializerSet
         return RecipeSerializerGet
 
     @staticmethod
@@ -136,9 +126,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return self.delete_obj(request, pk, FavoriteRecipes)
 
 
-
-
-
 class UserViewSet(UserViewSet):
     queryset = Users.objects.all()
     serializer_class = FoodUserSerializer
@@ -184,15 +171,13 @@ class UserViewSet(UserViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
-    
+
     @subscribe.mapping.delete
     def delete_subscribe(self, request, id):
         following = get_object_or_404(Users, pk=id)
         through_following = Subscriptions.objects.filter(user=request.user,
-                                                  following=following)
+                                                         following=following)
         if through_following.exists():
             through_following.delete()
             return Response(status.HTTP_204_NO_CONTENT)
-        return Response({'errors':'not_subscription'})
- 
-
+        return Response({'errors': 'not_subscription'})
