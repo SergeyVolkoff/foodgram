@@ -11,10 +11,12 @@ class Users(AbstractUser):
         max_length=150,
         unique=True,
         validators=[username_validator],
+        verbose_name='Имя пользователя',
     )
     email = models.EmailField(
         max_length=150,
         unique=True,
+        verbose_name='Почта',
     )
     first_name = models.CharField(
         max_length=150,
@@ -27,6 +29,11 @@ class Users(AbstractUser):
     password = models.CharField(
         max_length=150,
         verbose_name='Пароль'
+    )
+    avatar = models.ImageField(
+        verbose_name='Аватар',
+        upload_to='users/avatars',
+        blank=True
     )
 
     REQUIRED_FIELDS = ("first_name", "last_name", "username")
@@ -42,28 +49,33 @@ class Users(AbstractUser):
 
 
 class Subscriptions(models.Model):
+    """Модель подписки."""
 
     user = models.ForeignKey(
         Users,
         on_delete=models.CASCADE,
-        related_name='follower'
+        related_name='subscriber',
+        verbose_name='Пользователь подписчик'
     )
-    following = models.ForeignKey(
+    author = models.ForeignKey(
         Users,
         on_delete=models.CASCADE,
-        related_name='following'
+        related_name='subscribed',
+        verbose_name='Автор рецепта'
+    )
+    subscription_date = models.DateTimeField(
+        verbose_name='Дата подписки',
+        auto_now_add=True
     )
 
     class Meta:
+        ordering = ('subscription_date',)
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
-
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'following'],
-                name='unique_user_following'
-            )
-        ]
+                fields=['user', 'author'],
+                name='unique_user_subscription')]
 
-        def __str__(self):
-            return f'{self.user} {self.following}'
+    def __str__(self):
+        return f'{self.user} подписался на {self.author}'
