@@ -1,7 +1,6 @@
-from django.core.files.base import ContentFile
 from django.db.models import Sum
 from django.forms import ValidationError
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from djoser.views import UserViewSet
 from django.shortcuts import get_object_or_404
 
@@ -19,11 +18,9 @@ from .serializers import (TagSerializer,
                           RecipeSerializerSet,
                           IngredientSerializer,
                           ShoppingByRecipeSerializer,
-                          ShowSubscriberSerializer,
                           SubscriberSerializer,
                           FavoriteRecipeSerializer,
                           FoodUserSerializer,
-                          RecipeSerializerShort
                           )
 from recipes.models import (Tag,
                             Ingredient,

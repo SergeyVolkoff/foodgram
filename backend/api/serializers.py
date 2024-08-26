@@ -1,8 +1,6 @@
-from django.forms import ValidationError  # flake8: noqa
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.relations import PrimaryKeyRelatedField  # flake8: noqa
 
 from recipes.models import (Tag,
                             Ingredient,
