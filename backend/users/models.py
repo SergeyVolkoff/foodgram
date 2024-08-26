@@ -62,7 +62,8 @@ class Subscriptions(models.Model):
         Users,
         on_delete=models.CASCADE,
         related_name='subscribed',
-        verbose_name='Автор рецепта'
+        verbose_name='Автор рецепта',
+        null=True
     )
     subscription_date = models.DateTimeField(
         verbose_name='Дата подписки',
