@@ -1,6 +1,3 @@
-import base64
-import rest_framework.permissions
-
 from django.core.files.base import ContentFile
 from django.db.models import Sum
 from django.forms import ValidationError
