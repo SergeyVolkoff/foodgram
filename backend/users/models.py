@@ -33,7 +33,8 @@ class Users(AbstractUser):
     avatar = models.ImageField(
         verbose_name='Аватар',
         upload_to='users/avatars',
-        blank=True
+        blank=True,
+        null=True,
     )
 
     REQUIRED_FIELDS = ("first_name", "last_name", "username")
@@ -65,7 +66,8 @@ class Subscriptions(models.Model):
     )
     subscription_date = models.DateTimeField(
         verbose_name='Дата подписки',
-        auto_now_add=True
+        auto_now_add=True,
+        null=True
     )
 
     class Meta:
