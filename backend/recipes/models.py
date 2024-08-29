@@ -38,7 +38,6 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        # ordering = ('name',)
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
 
@@ -74,7 +73,6 @@ class Recipe(models.Model):
     text = models.TextField(
         'Текст',
         help_text='Введите текст',
-        # verbose_name='Описание'
     )
     cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления(в минутах)',
@@ -158,7 +156,7 @@ class ShoppingByRecipe(models.Model):
         return f'{self.recipe} {self.user}'
 
 
-class FavoriteRecipes(models.Model):
+class FavoriteRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         related_name='favorite',

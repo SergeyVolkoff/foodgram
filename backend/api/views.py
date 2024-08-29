@@ -26,9 +26,9 @@ from recipes.models import (Tag,
                             Ingredient,
                             Recipe,
                             RecipeIngredient,
-                            FavoriteRecipes,
+                            FavoriteRecipe,
                             ShoppingByRecipe)
-from users.models import Users, Subscriptions
+from users.models import Users, Subscription
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -63,7 +63,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
-        return self.delete_obj(request, pk, FavoriteRecipes)
+        return self.delete_obj(request, pk, FavoriteRecipe)
 
     @staticmethod
     def delete_obj(request, pk, model_name):
@@ -166,14 +166,14 @@ class UserViewSet(UserViewSet):
         filter_set = {'user': request.user, 'author': self.get_object()}
         message = {'success': 'Подписка успешно удалена!',
                    'error': 'Вы небыли подписаны!'}
-        return self.delete_subscribe(Subscriptions, filter_set, message)
+        return self.delete_subscribe(Subscription, filter_set, message)
 
     @action(detail=False,
             methods=['GET'],
             permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
-        subscriptions = Subscriptions.objects.filter(user=user)
+        subscriptions = Subscription.objects.filter(user=user)
 
         paginator = self.pagination_class()
         pages = paginator.paginate_queryset(subscriptions, request)

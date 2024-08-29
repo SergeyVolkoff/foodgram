@@ -6,9 +6,9 @@ from recipes.models import (Tag,
                             Ingredient,
                             Recipe,
                             RecipeIngredient,
-                            FavoriteRecipes,
+                            FavoriteRecipe,
                             ShoppingByRecipe)
-from users.models import Users, Subscriptions
+from users.models import Users, Subscription
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -34,7 +34,7 @@ class FoodUserSerializer(UserSerializer):
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
         if user.is_authenticated:
-            return Subscriptions.objects.filter(
+            return Subscription.objects.filter(
                 author=obj, user=user).exists()
             return True
         return False
@@ -97,7 +97,7 @@ class RecipeSerializerGet(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return FavoriteRecipes.objects.filter(
+        return FavoriteRecipe.objects.filter(
             user=user, recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
@@ -226,14 +226,13 @@ class RecipeSerializerSet(serializers.ModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        # request = self.context.get('request')
         return RecipeSerializerGet(instance, context=self.context).data
 
 
 class FavoriteRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = FavoriteRecipes
+        model = FavoriteRecipe
         fields = '__all__'
         validators = [
             serializers.UniqueTogetherValidator(
@@ -293,7 +292,7 @@ class ShowSubscriberSerializer(serializers.Serializer):
 
 class SubscriberSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Subscriptions
+        model = Subscription
         fields = ('user', 'author')
 
     def to_representation(self, instance):

@@ -49,7 +49,7 @@ class Users(AbstractUser):
         return self.username
 
 
-class Subscriptions(models.Model):
+class Subscription(models.Model):
     """Модель подписки."""
 
     user = models.ForeignKey(

@@ -5,18 +5,18 @@ from recipes.models import (Tag,
                             Ingredient,
                             Recipe,
                             RecipeIngredient,
-                            FavoriteRecipes,
+                            FavoriteRecipe,
                             ShoppingByRecipe)
 
-from users.models import Subscriptions, Users
+from users.models import Subscription, Users
 
 admin.site.register(Tag)
 admin.site.register(Ingredient)
 admin.site.register(Recipe)
-admin.site.register(FavoriteRecipes)
+admin.site.register(FavoriteRecipe)
 admin.site.register(RecipeIngredient)
 admin.site.register(ShoppingByRecipe)
-admin.site.register(Subscriptions)
+admin.site.register(Subscription)
 admin.site.register(Users)
 
 
@@ -26,7 +26,6 @@ class UserAdmin(UserAdmin):
         'email',
         'first_name',
         'last_name',
-        # 'count_follow',
         'count_recipe',
     )
     list_filter = ('username', 'email')
@@ -66,7 +65,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('name', 'author', 'tags')
 
     def in_favorited(self, obj):
-        return Subscriptions.objects.filter(
+        return Subscription.objects.filter(
             recipe=obj
         ).count()
     in_favorited.short_description = 'В избранных'

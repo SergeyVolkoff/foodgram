@@ -4,7 +4,8 @@ from rest_framework import routers
 from .views import (RecipeViewSet,
                     UserViewSet,
                     TagViewSet,
-                    IngredientViewSet
+                    IngredientViewSet,
+                    Subscription
                     )
 
 router = routers.DefaultRouter()
