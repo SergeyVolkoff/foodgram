@@ -37,7 +37,6 @@ class FoodUserSerializer(UserSerializer):
         if user.is_authenticated:
             return Subscription.objects.filter(
                 author=obj, user=user).exists()
-            return True
         return False
 
     def create(self, validated_data):
