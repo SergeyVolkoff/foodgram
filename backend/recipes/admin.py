@@ -43,7 +43,7 @@ class UserAdmin(UserAdmin):
 
 class TagAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'slug', 
+        'name', 'slug',
     )
 
 

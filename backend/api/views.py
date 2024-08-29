@@ -1,10 +1,6 @@
-import base64
-import rest_framework.permissions
-
-from django.core.files.base import ContentFile
 from django.db.models import Sum
 from django.forms import ValidationError
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from djoser.views import UserViewSet
 from django.shortcuts import get_object_or_404
 
@@ -22,11 +18,9 @@ from .serializers import (TagSerializer,
                           RecipeSerializerSet,
                           IngredientSerializer,
                           ShoppingByRecipeSerializer,
-                          ShowSubscriberSerializer,
                           SubscriberSerializer,
                           FavoriteRecipeSerializer,
                           FoodUserSerializer,
-                          RecipeSerializerShort
                           )
 from recipes.models import (Tag,
                             Ingredient,
@@ -34,13 +28,14 @@ from recipes.models import (Tag,
                             RecipeIngredient,
                             FavoriteRecipe,
                             ShoppingByRecipe)
-from users.models import Users,Subscription
+from users.models import Users, Subscription
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
+
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
@@ -56,16 +51,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
-            return  RecipeSerializerSet
+            return RecipeSerializerSet
         return RecipeSerializerGet
-    
 
     @action(methods=['post'],
             detail=True,
             permission_classes=(IsAuthenticated,))
     def favorite(self, request, pk):
         """recipe/{id}/favorite/."""
-        return self.add_obj(request, pk,  FavoriteRecipeSerializer)
+        return self.add_obj(request, pk, FavoriteRecipeSerializer)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
@@ -105,7 +99,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):
         return self.delete_obj(request, pk, ShoppingByRecipe)
-    
+
     @staticmethod
     def ingredients_for_buy(ingredients):
         shopping_list = ''
@@ -116,7 +110,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 f"({item['ingredient__units_measure']})\n"
             )
         return shopping_list
-    
+
     @action(detail=False, methods=['GET'],
             permission_classes=[IsAuthenticated, ],
             url_path='download_shopping_cart',
@@ -143,7 +137,7 @@ class UserViewSet(UserViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     def delete_subscribe(self, model, filter_set, message: dict):
         subscription = model.objects.filter(**filter_set).first()
         if subscription:
@@ -182,10 +176,9 @@ class UserViewSet(UserViewSet):
         subscriptions = Subscription.objects.filter(user=user)
 
         paginator = self.pagination_class()
-        pages  = paginator.paginate_queryset(subscriptions, request)
+        pages = paginator.paginate_queryset(subscriptions, request)
 
-        serializer = SubscriberSerializer(pages, 
-                                        context={'request': request},
-                                        many=True
-                                        )
+        serializer = SubscriberSerializer(pages,
+                                          context={'request': request},
+                                          many=True)
         return paginator.get_paginated_response(serializer.data)
