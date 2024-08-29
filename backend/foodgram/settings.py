@@ -9,6 +9,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', )
 
 
 # ALLOWED_HOSTS = ['51.250.26.198', '127.0.0.1', 'localhost', 'foodgramic.ddns.net']
+
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 DEBUG = os.getenv('DEBUG', )
