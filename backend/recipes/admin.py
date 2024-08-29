@@ -26,6 +26,7 @@ class UserAdmin(UserAdmin):
         'email',
         'first_name',
         'last_name',
+        # 'count_follow',
         'count_recipe',
     )
     list_filter = ('username', 'email')
@@ -42,7 +43,7 @@ class UserAdmin(UserAdmin):
 
 class TagAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'slug', 'color'
+        'name', 'slug', 
     )
 
 
@@ -74,7 +75,8 @@ class RecipeAdmin(admin.ModelAdmin):
 class RecipeIngredientAdmin(admin.ModelAdmin):
     list_display = (
         'recipe',
-        'ingredient'
+        'ingredient',
+        'quantity'
     )
 
 

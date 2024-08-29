@@ -1,11 +1,10 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 from users.models import Users
 
-
 class Tag(models.Model):
-
     name = models.CharField(
         verbose_name='Название',
         max_length=32,
@@ -16,7 +15,7 @@ class Tag(models.Model):
         max_length=32,
         verbose_name='Уникальный слаг',
     )
-
+   
     class Meta:
         ordering = ('name',)
         verbose_name = 'Тег'
@@ -27,7 +26,6 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-
     name = models.CharField(
         verbose_name='Название',
         max_length=128,
@@ -38,15 +36,14 @@ class Ingredient(models.Model):
     )
 
     class Meta:
+        # ordering = ('name',)
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
 
     def __str__(self):
         return self.name
 
-
 class Recipe(models.Model):
-
     name = models.CharField(
         verbose_name='Название',
         max_length=256
@@ -73,6 +70,7 @@ class Recipe(models.Model):
     text = models.TextField(
         'Текст',
         help_text='Введите текст',
+        # verbose_name='Описание'
     )
     cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления(в минутах)',
@@ -92,8 +90,7 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-
-
+    
 class RecipeIngredient(models.Model):
     '''Bridging model!'''
     ingredient = models.ForeignKey(
@@ -116,6 +113,7 @@ class RecipeIngredient(models.Model):
                 1, message='Ингредиентов не может быть меньше 1')]
     )
 
+
     class Meta:
         verbose_name = 'Кол-во ингридиента в рецепте'
         verbose_name_plural = 'Кол-во ингридиента в рецепте'
@@ -126,7 +124,7 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
         return f'{self.ingredient}–{self.amount}'
-
+    
 
 class ShoppingByRecipe(models.Model):
     recipe = models.ForeignKey(
@@ -154,7 +152,6 @@ class ShoppingByRecipe(models.Model):
 
     def __str__(self):
         return f'{self.recipe} {self.user}'
-
 
 class FavoriteRecipe(models.Model):
     recipe = models.ForeignKey(

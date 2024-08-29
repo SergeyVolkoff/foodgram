@@ -1,22 +1,17 @@
 import os
 from pathlib import Path
 import rest_framework.permissions
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# SECRET_KEY = 'django-insecure-1cv%#e9#-oi!y^ik9h)nl63n(m@p2yoifo9*&1=ym0ys)iys^$'
+SECRET_KEY = os.getenv('SECRET_KEY', )
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1cv%#e9#-oi!y^ik9h)nl63n(m@p2yoifo9*&1=ym0ys)iys^$'
+# ALLOWED_HOSTS = ['51.250.26.198', '127.0.0.1', 'localhost', 'foodgramic.ddns.net']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1;localhost').split(';')
-ALLOWED_HOSTS = ['51.250.26.198', '127.0.0.1', 'localhost', 'foodgramic.ddns.net']
-# Application definition
+DEBUG = os.getenv('DEBUG', )
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -108,7 +103,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 
