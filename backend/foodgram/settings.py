@@ -1,6 +1,10 @@
 import os
+from dotenv import load_dotenv
 from pathlib import Path
+
 import rest_framework.permissions
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
