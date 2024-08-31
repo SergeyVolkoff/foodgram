@@ -8,14 +8,11 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECRET_KEY = 'django-insecure-1cv%#e9#-oi!y^ik9h)nl63n(m@p2yoifo9*&1=ym0ys)iys^$'
 SECRET_KEY = os.getenv('SECRET_KEY', 'key')
 
-# DEBUG = False
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-# ALLOWED_HOSTS = ['51.250.26.198', '127.0.0.1', 'localhost',  'foodgramic.ddns.net']
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',') # Падает с err400!! 
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',

@@ -38,8 +38,8 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
         return self.name
@@ -100,7 +100,7 @@ class RecipeIngredient(models.Model):
         Ingredient,
         related_name='recipe',
         on_delete=models.CASCADE,
-        verbose_name='Ингридиент'
+        verbose_name='Ингредиент'
     )
     recipe = models.ForeignKey(
         Recipe,
@@ -117,8 +117,8 @@ class RecipeIngredient(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Кол-во ингридиента в рецепте'
-        verbose_name_plural = 'Кол-во ингридиента в рецепте'
+        verbose_name = 'Кол-во ингредиента в рецепте'
+        verbose_name_plural = 'Кол-во ингредиента в рецепте'
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
