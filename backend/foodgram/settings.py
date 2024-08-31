@@ -9,7 +9,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECRET_KEY = 'django-insecure-1cv%#e9#-oi!y^ik9h)nl63n(m@p2yoifo9*&1=ym0ys)iys^$'
-SECRET_KEY = os.getenv('SECRET_KEY','key')
+SECRET_KEY = os.getenv('SECRET_KEY', 'key')
 
 # DEBUG = False
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
@@ -140,4 +140,3 @@ DJOSER = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
