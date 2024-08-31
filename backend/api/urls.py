@@ -5,7 +5,6 @@ from .views import (RecipeViewSet,
                     UserViewSet,
                     TagViewSet,
                     IngredientViewSet,
-                    Subscription
                     )
 
 router = routers.DefaultRouter()
