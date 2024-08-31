@@ -38,7 +38,7 @@ class FoodUserSerializer(UserSerializer):
             return Subscription.objects.filter(
                 author=obj, user=user).exists()
         return False
-    
+        
     def create(self, validated_data):
         return Users.objects.create_user(**validated_data)
 

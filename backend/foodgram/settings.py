@@ -14,8 +14,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'key')
 # DEBUG = False
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['51.250.26.198', '127.0.0.1', 'localhost',  'foodgramic.ddns.net']
-# Падает с err400!! - ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
+# ALLOWED_HOSTS = ['51.250.26.198', '127.0.0.1', 'localhost',  'foodgramic.ddns.net']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',') # Падает с err400!! 
 
 INSTALLED_APPS = [
     'django.contrib.admin',
