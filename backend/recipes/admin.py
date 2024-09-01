@@ -26,7 +26,6 @@ class UserAdmin(UserAdmin):
         'email',
         'first_name',
         'last_name',
-        # 'count_follow',
         'count_recipe',
     )
     list_filter = ('username', 'email')

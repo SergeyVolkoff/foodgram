@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -166,7 +167,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
     def create_ingredients(self, recipe, ingredients):
         ingredients_obj = []
         for ingredient in ingredients:
-            ingredient_obj = Ingredient.objects.get(id=ingredient['id'])
+            ingredient_obj = get_object_or_404(Ingredient, id=ingredient['id'])
             amount = ingredient['amount']
             ingredients_obj.append(
                 RecipeIngredient(
