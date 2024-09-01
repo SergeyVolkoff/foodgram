@@ -1,13 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-
-from recipes.models import (Tag,
-                            Ingredient,
-                            Recipe,
-                            RecipeIngredient,
-                            FavoriteRecipe,
-                            ShoppingByRecipe)
-
+from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingByRecipe, Tag)
 from users.models import Subscription, Users
 
 admin.site.register(Tag)
