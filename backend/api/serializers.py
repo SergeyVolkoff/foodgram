@@ -1,6 +1,7 @@
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+
 from recipes.models import (
     FavoriteRecipe,
     Ingredient,
@@ -170,7 +171,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
             ingredients_obj.append(
                 RecipeIngredient(
                     recipe=recipe,
-                    ingredient=Ingredient.objects.get(pk=ingredient['id']),
+                    ingredient_id=ingredient.get('id'),
                     amount=ingredient['amount']
                 )
             )
