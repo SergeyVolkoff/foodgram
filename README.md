@@ -10,7 +10,6 @@ git clone https://github.com/SergeyVolkoff/foodgram.git
 ```
 cp .env.template .env
 ```
-
 Установите docker и  docker-compose на сервер:
 ```
 apt install docker.io 
