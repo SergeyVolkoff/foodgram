@@ -30,6 +30,9 @@ docker-compose exec web python manage.py migrate --noinput
 ```
 docker-compose exec web python manage.py createsuperuser
 ```
-
+На сервере соберите проект:
+```
+sudo docker-compose up -d --build
+```
 ### Технологии:
  Python Django Django REST Framework PostgreSQL Nginx gunicorn docker GitHubActions 
