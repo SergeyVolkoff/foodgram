@@ -1,7 +1,6 @@
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-
 from recipes.models import (
     FavoriteRecipe,
     Ingredient,
@@ -82,18 +81,35 @@ class RecipeSerializerGet(serializers.ModelSerializer):
                   'name', 'image', 'text',
                   'cooking_time')
 
-    def get_is_favorited(self, obj):
-        return self._check_user_obj_relation(obj, FavoriteRecipe)
+    # def get_is_favorited(self, obj):
+    #     return self._check_user_obj_relation(obj, FavoriteRecipe)
+
+    # def get_is_in_shopping_cart(self, obj):
+    #     return self._check_user_obj_relation(obj, ShoppingByRecipe)
+
+    # def _check_user_obj_relation(self, obj, model):
+    #     user = self.context.get('request').user
+    #     if user.is_anonymous:
+    #         return False
+    #     return model.objects.filter(user=user, recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        return self._check_user_obj_relation(obj, ShoppingByRecipe)
-
-    def _check_user_obj_relation(self, obj, model):
-        user = self.context.get('request').user
-        if user.is_anonymous:
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
             return False
-        return model.objects.filter(user=user, recipe=obj).exists()
-
+        return ShoppingByRecipe.objects.filter(
+            user=request.user,
+            recipe=obj
+        ).exists()
+    
+    def get_is_favorited(self, obj):
+        """Метод проверки на добавление в избранное."""
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
+            return False
+        return FavoriteRecipe.objects.filter(
+            user=request.user, recipe=obj
+        ).exists()
 
 class CustomIngredientRecipeSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()

@@ -114,6 +114,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
         shopping_list = self.ingredients_for_buy(ingredients)
         return HttpResponse(shopping_list, content_type='text/plain')
 
+    @action(
+        methods=['GET'],
+        url_name='redirect_to_full_link',
+        url_path='get-link',
+        detail=True
+    )
+    def redirect_to_full_link(self, request, pk):
+        get_object_or_404(Recipe, id=pk)
+        url = request.build_absolute_uri(f'/recipes/{pk}/')
+        return Response(
+            {'short-link': url},
+            status=status.HTTP_200_OK
+        )
+
 
 class UserViewSet(UserViewSet):
     queryset = Users.objects.all()
