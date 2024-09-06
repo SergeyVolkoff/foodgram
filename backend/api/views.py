@@ -15,7 +15,7 @@ from .pagination import DefaultPagination
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import (FavoriteRecipeSerializer, FoodUserSerializer,
                           IngredientSerializer, RecipeSerializerGet,
-                          RecipeSerializerSet, ShoppingByRecipeSerializer,
+                          RecipeSerializerSet, RecipeSerializerShort, ShoppingByRecipeSerializer,
                           SubscriberSerializer, TagSerializer)
 
 
@@ -47,7 +47,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=(IsAuthenticated,))
     def favorite(self, request, pk):
         """recipe/{id}/favorite/."""
-        return self.add_obj(request, pk, FavoriteRecipeSerializer)
+        return self.add_obj(request, pk, FavoriteRecipe)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
@@ -64,25 +64,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
-    def add_obj(request, pk, serializers_name):
+    def add_obj(request, pk, model):
         try:
             recipe = Recipe.objects.get(pk=pk)
         except Recipe.DoesNotExist:
             raise ValidationError(
                 'Такого рецепта нет!'
             )
-        serializer = serializers_name(data={'recipe': recipe.id,
-                                            'user': request.user.id},
-                                      context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status.HTTP_201_CREATED)
+        user = get_object_or_404(Users, id=request.user.id)
+        model.objects.create(user=user, recipe=recipe)
+        
+        serializer = RecipeSerializerShort(recipe)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(methods=['post'],
             detail=True,
             permission_classes=(IsAuthenticated,))
     def shopping_cart(self, request, pk):
-        return self.add_obj(request, pk, ShoppingByRecipeSerializer)
+        return self.add_obj(request, pk, ShoppingByRecipe)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):
