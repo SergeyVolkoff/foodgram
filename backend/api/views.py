@@ -15,7 +15,8 @@ from .pagination import DefaultPagination
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import (FavoriteRecipeSerializer, FoodUserSerializer,
                           IngredientSerializer, RecipeSerializerGet,
-                          RecipeSerializerSet, RecipeSerializerShort, ShoppingByRecipeSerializer,
+                          RecipeSerializerSet, RecipeSerializerShort,
+                          ShoppingByRecipeSerializer,
                           SubscriberSerializer, TagSerializer)
 
 
@@ -73,7 +74,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
         user = get_object_or_404(Users, id=request.user.id)
         model.objects.create(user=user, recipe=recipe)
-        
+
         serializer = RecipeSerializerShort(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
