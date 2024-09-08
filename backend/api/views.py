@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
                             RecipeIngredient, ShoppingByRecipe, Tag)
 from users.models import Subscription, Users
+from .filters import IngredientFilter, RecipeFilter
 from .pagination import DefaultPagination
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import (FavoriteRecipeSerializer, FoodUserSerializer,
@@ -24,7 +25,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
-
+    filterset_class = IngredientFilter
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
@@ -37,6 +38,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializerGet
     pagination_class = DefaultPagination
     permission_classes = (IsOwnerOrReadOnly,)
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
