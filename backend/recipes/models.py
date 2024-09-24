@@ -131,14 +131,14 @@ class RecipeIngredient(models.Model):
 class ShoppingByRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
-        related_name='shopp_recipe',
+        # related_name='shopp_recipe',
         verbose_name='Список покупок',
         on_delete=models.CASCADE,
     )
     user = models.ForeignKey(
         Users,
         verbose_name='Пользователь покупок',
-        related_name='shopping_cart',
+        # related_name='shopping_cart',
         on_delete=models.CASCADE,
     )
 
@@ -160,13 +160,13 @@ class ShoppingByRecipe(models.Model):
 class FavoriteRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
-        related_name='recipe_favorite',
+        # related_name='recipe_favorite',
         verbose_name='Избранный рецепт',
         on_delete=models.CASCADE
     )
     user = models.ForeignKey(
         Users,
-        related_name='favorite',
+        # related_name='favorite',
         verbose_name='Пользователь',
         on_delete=models.CASCADE,
     )
