@@ -143,6 +143,7 @@ class ShoppingByRecipe(models.Model):
     )
 
     class Meta:
+        default_related_name = 'recipe_shopping'
         verbose_name = 'Рецепт для покупок'
         verbose_name_plural = 'Рецепты для покупок'
         constraints = [
@@ -169,3 +170,6 @@ class FavoriteRecipe(models.Model):
         verbose_name='Пользователь',
         on_delete=models.CASCADE,
     )
+
+    class Meta:
+        default_related_name = 'recipe_favorite'

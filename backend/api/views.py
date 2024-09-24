@@ -1,6 +1,7 @@
 from django.db.models import Sum
 from django.forms import ValidationError
 from django.http import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
@@ -22,10 +23,11 @@ from .serializers import (FavoriteRecipeSerializer, FoodUserSerializer,
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
-    permission_classes = (AllowAny,)
-    filterset_class = IngredientFilter
+    queryset = Recipe.objects.all()
+    permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class = DefaultPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
