@@ -23,11 +23,10 @@ from .serializers import (FavoriteRecipeSerializer, FoodUserSerializer,
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Recipe.objects.all()
-    permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class = DefaultPagination
-    filter_backends = (DjangoFilterBackend,)
-    filterset_class = RecipeFilter
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    filterset_class = IngredientFilter
+    permission_classes = (AllowAny,)
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
@@ -37,9 +36,9 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializerGet
-    pagination_class = DefaultPagination
     permission_classes = (IsOwnerOrReadOnly,)
+    pagination_class = DefaultPagination
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
     def get_serializer_class(self):
