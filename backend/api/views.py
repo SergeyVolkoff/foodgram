@@ -15,7 +15,7 @@ from users.models import Subscription, Users
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import MyPagination
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from .serializers import (AvatarSerialiser,FavoriteRecipeSerializer,
+from .serializers import (AvatarSerialiser, FavoriteRecipeSerializer,
                           FoodUserSerializer,
                           IngredientSerializer, RecipeSerializerGet,
                           RecipeSerializerSet, RecipeSerializerShort,
@@ -28,6 +28,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     filterset_class = IngredientFilter
     permission_classes = (AllowAny,)
+
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
@@ -44,9 +45,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
-            return  RecipeSerializerSet
+            return RecipeSerializerSet
         return RecipeSerializerGet
-    
+
     @staticmethod
     def add_obj(request, pk, model):
         try:
@@ -57,7 +58,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
         user = get_object_or_404(Users, id=request.user.id)
         model.objects.create(user=user, recipe=recipe)
-        
         serializer = RecipeSerializerShort(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -65,7 +65,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def delete_obj(request, pk, model_name):
         recipe = get_object_or_404(Recipe, pk=pk)
         obj = model_name.objects.filter(user=request.user,
-                                                recipe=recipe)
+                                        recipe=recipe)
         if obj.exists():
             obj.delete()
             return Response(status.HTTP_204_NO_CONTENT)
@@ -77,7 +77,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=(IsAuthenticated,))
     def favorite(self, request, pk):
         """recipes/{id}/favorite/."""
-        return self.add_obj(request, pk,  FavoriteRecipe)
+        return self.add_obj(request, pk, FavoriteRecipe)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
@@ -92,7 +92,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):
         return self.delete_obj(request, pk, ShoppingByRecipe)
-    
+
     @staticmethod
     def ingredients_for_buy(ingredients):
         shopping_list = ''
@@ -103,7 +103,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 f"({item['ingredient__units_measure']})\n"
             )
         return shopping_list
-    
+
     @action(detail=False, methods=['GET'],
             permission_classes=[IsAuthenticated, ],
             url_path='download_shopping_cart',
@@ -118,13 +118,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).annotate(sum=Sum('amount'))
         shopping_list = self.ingredients_for_buy(ingredients)
         return HttpResponse(shopping_list, content_type='text/plain')
-    
-    @action(
-        methods=['GET'],
-        url_name='redirect_to_full_link',
-        url_path='get-link',
-        detail = True
-    )
+
+    @action(methods=['GET'],
+            url_name='redirect_to_full_link',
+            url_path='get-link',
+            detail=True)
     def redirect_to_full_link(self, request, pk):
         get_object_or_404(Recipe, id=pk)
         url = request.build_absolute_uri(f'/recipes/{pk}/')
@@ -144,7 +142,7 @@ class UserViewSet(UserViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     def delete_subscribe(self, model, filter_set, message: dict):
         subscription = model.objects.filter(**filter_set).first()
         if subscription:
@@ -213,4 +211,3 @@ class UserViewSet(UserViewSet):
         serializer.is_valid(raise_exception=True)
         request.user.avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
