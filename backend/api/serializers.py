@@ -275,3 +275,11 @@ class SubscriberSerializer(serializers.ModelSerializer):
             context=self.context).data
         user_data['recipes_count'] = len(user_data['recipes'])
         return user_data
+
+
+class AvatarSerialiser(serializers.ModelSerializer):
+    avatar = Base64ImageField()
+
+    class Meta:
+        model = Users
+        fields = ('avatar',)

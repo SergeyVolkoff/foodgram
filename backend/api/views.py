@@ -15,7 +15,8 @@ from users.models import Subscription, Users
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import MyPagination
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from .serializers import (FavoriteRecipeSerializer, FoodUserSerializer,
+from .serializers import (AvatarSerialiser,FavoriteRecipeSerializer,
+                          FoodUserSerializer,
                           IngredientSerializer, RecipeSerializerGet,
                           RecipeSerializerSet, RecipeSerializerShort,
                           ShoppingByRecipeSerializer,
@@ -186,3 +187,30 @@ class UserViewSet(UserViewSet):
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
+
+    @action(methods=['PUT'],
+            detail=False,
+            permission_classes=(IsAuthenticated,),
+            url_path='me/avatar', url_name='avatar',)
+    def addavatar(self, request):
+        serializer = AvatarSerialiser(
+            self.request.user,
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    @addavatar.mapping.delete
+    def delete_avatar(self, request):
+        serializer = AvatarSerialiser(
+            self.request.user,
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        request.user.avatar.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
