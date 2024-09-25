@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from django.forms import ValidationError
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
@@ -15,11 +15,10 @@ from users.models import Subscription, Users
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import MyPagination
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from .serializers import (AvatarSerialiser, FavoriteRecipeSerializer,
+from .serializers import (AvatarSerialiser,
                           FoodUserSerializer,
                           IngredientSerializer, RecipeSerializerGet,
                           RecipeSerializerSet, RecipeSerializerShort,
-                          ShoppingByRecipeSerializer,
                           SubscriberSerializer, TagSerializer)
 
 
