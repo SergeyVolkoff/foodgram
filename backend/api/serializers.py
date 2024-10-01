@@ -22,9 +22,9 @@ class FoodUserSerializer(UserSerializer):
     class Meta:
         model = Users
         fields = ('username',
-                  'email',
                   'first_name',
                   'last_name',
+                  'email',
                   'is_subscribed',
                   'id')
 
