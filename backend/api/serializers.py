@@ -241,7 +241,7 @@ class ShowSubscriberSerializer(serializers.Serializer):
     recipes = serializers.SerializerMethodField(read_only=True)
     recipes_count = serializers.SerializerMethodField()
     avatar = serializers.ImageField(source='author.avatar')
-    
+
     class Meta:
         model = Users
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
