@@ -1,20 +1,16 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingByRecipe, Tag)
+
+from recipes.models import (Tag,
+                            Ingredient,
+                            Recipe,
+                            RecipeIngredient,
+                            FavoriteRecipe,
+                            ShoppingByRecipe)
 from users.models import Subscription, Users
 
-admin.site.register(Tag)
-admin.site.register(Ingredient)
-admin.site.register(Recipe)
-admin.site.register(FavoriteRecipe)
-admin.site.register(RecipeIngredient)
-admin.site.register(ShoppingByRecipe)
-admin.site.register(Subscription)
-admin.site.register(Users)
 
-
-class UserAdmin(UserAdmin):
+class UsersAdmin(UserAdmin):
     list_display = (
         'username',
         'email',
@@ -35,46 +31,52 @@ class UserAdmin(UserAdmin):
 
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = (
-        'name', 'slug',
-    )
+    list_display = ('name', 'slug',)
+    search_fields = ('name',)
 
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'measurement_unit',
+        'units_measure',
     )
-    list_filter = ('name',)
+    search_fields = ('name',)
+    list_filter = ('units_measure',)
+    list_display_links = ('name',)
+    empty_value_display = 'Empty'
 
 
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'author',
-        'in_favorited'
+        'pub_date',
+        'tags'
     )
 
     list_filter = ('tags',)
-    search_fields = ('name', 'author', 'tags')
-
-    def in_favorited(self, obj):
-        return Subscription.objects.filter(
-            recipe=obj
-        ).count()
-    in_favorited.short_description = 'В избранных'
+    search_fields = ('name', 'author', 'pub_date', 'tags', )
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):
     list_display = (
         'recipe',
         'ingredient',
-        'quantity'
+        'amount'
     )
 
 
-class FavoritesAdmin(admin.ModelAdmin):
+class FavoriteRecipeAdmin(admin.ModelAdmin):
     list_display = (
         'user',
         'recipe'
     )
+
+
+admin.site.register(Tag, TagAdmin)
+admin.site.register(Ingredient, IngredientAdmin)
+admin.site.register(Recipe, RecipeAdmin)
+admin.site.register(FavoriteRecipe, FavoriteRecipeAdmin)
+admin.site.register(RecipeIngredient, RecipeIngredientAdmin)
+admin.site.register(Subscription)
+admin.site.register(Users, UserAdmin)

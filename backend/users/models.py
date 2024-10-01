@@ -50,7 +50,6 @@ class Users(AbstractUser):
 
 
 class Subscription(models.Model):
-    """Модель подписки."""
 
     user = models.ForeignKey(
         Users,
@@ -76,7 +75,7 @@ class Subscription(models.Model):
         verbose_name_plural = 'Подписки'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'author'],
+                fields=['author', 'user'],
                 name='unique_user_subscription')]
 
     def __str__(self):

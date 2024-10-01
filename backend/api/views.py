@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from users.models import Subscription, Users
 
 from .filters import IngredientFilter, RecipeFilter
-from .pagination import MyPagination
+from .pagination import RecipePagination
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import (AvatarSerialiser,
                           FoodUserSerializer,
@@ -38,7 +38,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
-    pagination_class = MyPagination
+    pagination_class = RecipePagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
@@ -135,7 +135,7 @@ class UserViewSet(UserViewSet):
     queryset = Users.objects.all()
     serializer_class = FoodUserSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = MyPagination
+    pagination_class = RecipePagination
 
     def add_subscribe(self, serializer):
         serializer.is_valid(raise_exception=True)
@@ -156,6 +156,15 @@ class UserViewSet(UserViewSet):
         if self.action == 'me':
             self.permission_classes = (IsAuthenticated,)
         return super().get_permissions()
+
+    @action(methods=['get'], detail=False,
+            permission_classes=[IsAuthenticated],
+            url_name='me')
+    def me(self, request, *args, **kwargs):
+        serializer = FoodUserSerializer(self.request.user,
+                                        context={'request': request}
+                                        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True,
             methods=['POST'],
