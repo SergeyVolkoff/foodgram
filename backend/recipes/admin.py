@@ -51,11 +51,10 @@ class RecipeAdmin(admin.ModelAdmin):
         'name',
         'author',
         'pub_date',
-        'tags'
     )
 
     list_filter = ('tags',)
-    search_fields = ('name', 'author', 'pub_date', 'tags', )
+    search_fields = ('name', 'author', 'pub_date' )
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):
