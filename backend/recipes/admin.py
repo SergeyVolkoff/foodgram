@@ -5,8 +5,7 @@ from recipes.models import (Tag,
                             Ingredient,
                             Recipe,
                             RecipeIngredient,
-                            FavoriteRecipe,
-                            ShoppingByRecipe)
+                            FavoriteRecipe)
 from users.models import Subscription, Users
 
 
@@ -54,7 +53,7 @@ class RecipeAdmin(admin.ModelAdmin):
     )
 
     list_filter = ('tags',)
-    search_fields = ('name', 'author', 'pub_date' )
+    search_fields = ('name', 'author', 'pub_date')
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):

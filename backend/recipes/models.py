@@ -168,5 +168,6 @@ class FavoriteRecipe(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Избранные рецепты'
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
         default_related_name = 'recipe_favorite'
