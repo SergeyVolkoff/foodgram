@@ -194,7 +194,7 @@ class UserViewSet(UserViewSet):
         )
         return self.get_paginated_response(serializer.data)
 
-    @action(methods=['PUT'],
+    @action(methods=['GET','PUT'],
             detail=False,
             permission_classes=(IsAuthenticated,),
             url_path='me/avatar', url_name='avatar',)

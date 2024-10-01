@@ -16,7 +16,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class FoodUserSerializer(UserSerializer):
-
+    avatar = Base64ImageField(allow_null=True, required=False)
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -26,6 +26,7 @@ class FoodUserSerializer(UserSerializer):
                   'last_name',
                   'email',
                   'is_subscribed',
+                  'avatar',
                   'id')
 
     def get_is_subscribed(self, obj):
@@ -239,7 +240,8 @@ class RecipeSerializerShort(serializers.ModelSerializer):
 class ShowSubscriberSerializer(serializers.Serializer):
     recipes = serializers.SerializerMethodField(read_only=True)
     recipes_count = serializers.SerializerMethodField()
-
+    avatar = serializers.ImageField(source='author.avatar')
+    
     class Meta:
         model = Users
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
