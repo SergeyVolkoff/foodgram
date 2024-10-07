@@ -5,7 +5,8 @@ from users.models import Users
 
 
 class IngredientFilter(FilterSet):
-    name = filters.CharFilter(lookup_expr='istartswith')
+    name = filters.CharFilter(field_name='name',
+                              lookup_expr='istartswith')
 
     class Meta:
         model = Ingredient

@@ -4,19 +4,18 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingByRecipe, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from users.models import Subscription, Users
 
+from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingByRecipe, Tag)
+from users.models import Subscription, Users
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import RecipePagination
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from .serializers import (AvatarSerialiser,
-                          FoodUserSerializer,
+from .serializers import (AvatarSerialiser, FoodUserSerializer,
                           IngredientSerializer, RecipeSerializerGet,
                           RecipeSerializerSet, RecipeSerializerShort,
                           SubscriberSerializer, TagSerializer)
@@ -27,6 +26,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     filterset_class = IngredientFilter
     permission_classes = (AllowAny,)
+    filter_backends = (DjangoFilterBackend,)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

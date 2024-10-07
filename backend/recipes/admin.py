@@ -1,11 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from recipes.models import (Tag,
-                            Ingredient,
-                            Recipe,
-                            RecipeIngredient,
-                            FavoriteRecipe)
+from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
+                            RecipeIngredient, Tag)
 from users.models import Subscription, Users
 
 
