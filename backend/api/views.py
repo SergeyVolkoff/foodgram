@@ -1,3 +1,5 @@
+import random
+import string
 from django.db.models import Sum
 from django.forms import ValidationError
 from django.http import HttpResponse
@@ -6,6 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.generics import (ListAPIView)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
@@ -18,6 +21,7 @@ from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import (AvatarSerialiser, FoodUserSerializer,
                           IngredientSerializer, RecipeSerializerGet,
                           RecipeSerializerSet, RecipeSerializerShort,
+                          ShowSubscriberSerializer,
                           SubscriberSerializer, TagSerializer)
 
 
@@ -219,3 +223,17 @@ class UserViewSet(UserViewSet):
         serializer.is_valid(raise_exception=True)
         request.user.avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SubscriberViewSet(ListAPIView):
+    serializer_class = ShowSubscriberSerializer
+    pagination_class = RecipePagination
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.subscriber.all()
+
+def generate_short_url():
+    url_sub = ''.join(random.choices(string.ascii_letters + string.digits, k=3))
+    return "http:/localhost/s/" + url_sub

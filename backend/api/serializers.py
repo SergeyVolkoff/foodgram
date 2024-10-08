@@ -238,26 +238,44 @@ class RecipeSerializerShort(serializers.ModelSerializer):
 
 
 class ShowSubscriberSerializer(serializers.Serializer):
-    recipes = serializers.SerializerMethodField(read_only=True)
-    recipes_count = serializers.SerializerMethodField()
+    id = serializers.ReadOnlyField(source="author.id")
+    username = serializers.ReadOnlyField(source="author.username")
+    first_name = serializers.ReadOnlyField(source="author.first_name")
+    last_name = serializers.ReadOnlyField(source="author.last_name")
+    email = serializers.ReadOnlyField(source="author.email")
+    is_subscribed = serializers.SerializerMethodField(
+        method_name='get_is_subscribed')
+    recipes = serializers.SerializerMethodField(method_name='get_recipes')
+    recipes_count = serializers.SerializerMethodField(
+        method_name='get_recipes_count')
     avatar = serializers.ImageField(source='author.avatar')
-
+    
     class Meta:
         model = Users
-        fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'avatar', 'recipes', 'recipes_count')
+        fields = ('id', 'username', 'first_name',
+                  'last_name', 'email', 'avatar',
+                  'is_subscribed', 'recipes',
+                  'recipes_count'
+                  )
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        if request.GET.get('recipes_limit'):
+            recipe_limit = int(request.GET.get('recipes_limit'))
+            queryset = Recipe.objects.filter(author=obj.author)[:recipe_limit]
+        else:
+            queryset = Recipe.objects.filter(author=obj.author)
+        serializer = RecipeSerializerShort(
+            queryset, many=True, read_only=True)
+        return serializer.data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()
 
-    def get_recipes(self, obj):
+    def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        recipes_limit = request.query_params.get('recipes_limit')
-        recipes = obj.recipes.all()
-        if recipes_limit:
-            recipes = recipes[:int(recipes_limit)]
-        return RecipeSerializerShort(recipes, many=True,
-                                     context=self.context).data
+        return Subscription.objects.filter(
+            author=obj.author, user=request.user).exists()
 
 
 class SubscriberSerializer(serializers.ModelSerializer):
