@@ -21,7 +21,6 @@ class RecipeFilter(FilterSet):
     )
     author = filters.ModelChoiceFilter(
         queryset=Users.objects.all(),
-        lookup_expr='icontains'
     )
     is_favorited = filters.BooleanFilter(method='is_favorited_filter',
                                          field_name='is_favorited'

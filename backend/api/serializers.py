@@ -201,7 +201,7 @@ class RecipeSerializerSet(serializers.ModelSerializer):
 class FavoriteRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = FavoriteRecipe
+        model = Recipe
         fields = '__all__'
         validators = [
             serializers.UniqueTogetherValidator(
@@ -237,7 +237,7 @@ class RecipeSerializerShort(serializers.ModelSerializer):
         read_only_fields = ('__all__',)
 
 
-class ShowSubscriberSerializer(serializers.Serializer):
+class ShowSubscriberSerializer(FoodUserSerializer):
     id = serializers.ReadOnlyField(source="author.id")
     username = serializers.ReadOnlyField(source="author.username")
     first_name = serializers.ReadOnlyField(source="author.first_name")
@@ -245,16 +245,13 @@ class ShowSubscriberSerializer(serializers.Serializer):
     email = serializers.ReadOnlyField(source="author.email")
     is_subscribed = serializers.SerializerMethodField(
         method_name='get_is_subscribed')
-    recipes = serializers.SerializerMethodField(method_name='get_recipes')
-    recipes_count = serializers.SerializerMethodField(
-        method_name='get_recipes_count')
     avatar = serializers.ImageField(source='author.avatar')
-    
-    class Meta:
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta(FoodUserSerializer.Meta):
         model = Users
-        fields = ('id', 'username', 'first_name',
-                  'last_name', 'email', 'avatar',
-                  'is_subscribed', 'recipes',
+        fields = (*FoodUserSerializer.Meta.fields, 'recipes',
                   'recipes_count'
                   )
 

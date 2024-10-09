@@ -234,6 +234,8 @@ class SubscriberViewSet(ListAPIView):
         user = self.request.user
         return user.subscriber.all()
 
+
 def generate_short_url():
-    url_sub = ''.join(random.choices(string.ascii_letters + string.digits, k=3))
+    url_sub = ''.join(random.choices
+                      (string.ascii_letters + string.digits, k=3))
     return "http:/localhost/s/" + url_sub
